@@ -9,7 +9,9 @@
         public double sellPrice { get; set; }
         public int quantity { get; set; }
         public string description { get; set; }
-        public string author { get; set; }
+        public string? publisher { get; set; }  
+        public int authorId { get; set; }
+        public Author author { get; set; }
         public double rank { get; set; }
         public IEnumerable<Category> categories { get; set; }
         public IEnumerable<Image> images { get; set; }

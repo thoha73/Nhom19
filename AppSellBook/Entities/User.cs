@@ -16,7 +16,6 @@
         public IEnumerable<Role> roles { get; set; }
         public IEnumerable<Cart> carts { get; set; }
         public IEnumerable<Order> orders { get; set; }
-        public IEnumerable<CartDetail> cartDetails { get; set; }
         public IEnumerable<WishList> wishLists { get; set; }
         public IEnumerable<Commentation> commentations { get; set; }
     }

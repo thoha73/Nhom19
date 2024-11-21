@@ -14,11 +14,18 @@ namespace AppSellBook.Services.Books
 
         public async Task<Book> CreateBook(Book book)
         {
-            using(BookDBContext content= _contextFactory.CreateDbContext())
+            try
             {
-                content.Books.Add(book);
-                await content.SaveChangesAsync();
-                return book;
+                using (var context = _contextFactory.CreateDbContext())
+                {
+                    context.Books.Add(book);
+                    await context.SaveChangesAsync();
+                    return book;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi khi lưu sách vào cơ sở dữ liệu.", ex);
             }
         }
 
@@ -35,12 +42,27 @@ namespace AppSellBook.Services.Books
             }
         }
 
+        public async Task<bool> DeleteBooksAsync(List<int> bookIds)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                var books = await context.Books.Where(b => bookIds.Contains(b.bookId)).ToListAsync();
+                if (!books.Any())
+                {
+                    return false;
+                }
+                context.Books.RemoveRange(books);
+                return await context.SaveChangesAsync() > 0;
+            }
+        }
+
         public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            using(BookDBContext context=_contextFactory.CreateDbContext())
+            using (BookDBContext context = _contextFactory.CreateDbContext())
             {
-                return await context.Books.Include(c=>c.images)
-                                          .ToListAsync();
+                return await context.Books.Include(c => c.images)
+                                          .Include(a=>a.author)
+                                          .Include(c => c.categories).ToListAsync();
             }
         }
 
@@ -49,7 +71,25 @@ namespace AppSellBook.Services.Books
             using(BookDBContext context= _contextFactory.CreateDbContext())
             {
                 return await context.Books.Include(c => c.images)
+                                            .Include(a=>a.author)
+                                            .Include(c=>c.categories)
                                            .FirstOrDefaultAsync(r => r.bookId == bookId);
+            }
+        }
+
+        public async Task<int> GetBookCount()
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                return await context.Books.CountAsync();
+            }
+        }
+
+        public async Task<IEnumerable<Book>> GetBooksByCategory(int categoryId)
+        {
+            using(BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                return await context.Books.Include(c => c.images).Include(c=>c.categories).Where(c=>c.categories.Any(b=>b.categoryId==categoryId)).ToListAsync();
             }
         }
 

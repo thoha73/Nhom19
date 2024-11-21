@@ -8,7 +8,7 @@ namespace AppSellBook.Entities
         public int cardDetailId { get; set; }
         public Book book { get; set; }
         public Cart cart { get; set; }
-        public int cardId { get; set; }
+        public int cartId { get; set; }
         public int bookId { get; set; }
         public int quantity { get; set; }   
         public double sellPrice { get; set; }   

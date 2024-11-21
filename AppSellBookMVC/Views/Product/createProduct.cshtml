@@ -1,0 +1,259 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+
+    .file-upload {
+        position: relative;
+        display: inline-block;
+        text-align: center;
+        /* Căn giữa văn bản */
+    }
+
+    .file-input {
+        display: none;
+        /* Ẩn input file mặc định */
+    }
+
+    .button {
+        background-color: #9295cb;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        /* Bo tròn góc */
+        cursor: pointer;
+        /* Con trỏ chuột khi hover */
+        display: inline-flex;
+        /* Sử dụng flexbox */
+        align-items: center;
+        /* Căn giữa theo chiều dọc */
+        justify-content: center;
+        /* Căn giữa theo chiều ngang */
+    }
+
+    .border {
+        border: 2px solid #000;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    .preview-img {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        object-fit: cover;
+    }
+</style>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-4 text-gray-800">Tạo sản phẩm</h1>
+    <form action="@Url.Action("createProduct", "Product")" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="inputTensach">Tên sách</label>
+                    <input type="text" class="form-control" id="inputTensach" name="tensach" aria-describedby="title"
+                           placeholder="Nhập tên sách">
+                </div>
+                <div class="form-group">
+                    <label for="inputTacgia">Tác giả</label>
+                    <input type="text" class="form-control" id="inputTacgia" name="tacgia" placeholder="Nhập tác giả">
+                </div>
+                <div class="form-group">
+                    <label for="inputISBN">ISBN</label>
+                    <input type="text" class="form-control" id="inputISBN" name="isbn" placeholder="Nhập ISBN">
+                </div>
+                @* <div class="form-group">
+                    <label for="inputTheloai">Thể loại</label>
+                    <select type="text" class="form-control" id="inputTheloai" multiple>
+                        @foreach(var item in ViewBag.Categories)
+                        {
+                            <option value="@item.categoryId">
+                                @item.categoryName
+                             </option>
+                        }
+                    </select>
+                </div> *@
+                <div class="form-group">
+                    <label for="inputTheloai">Thể loại</label>
+                    <select class="form-control select2" id="inputTheloai" name="categories" multiple>
+@*                         @foreach (var item in ViewBag.Categories)
+                        {
+                            <option value="@item.categoryId">@item.categoryName</option>
+                        } *@
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inputNXB">Nhà xuất bản</label>
+                    <input type="text" class="form-control" id="inputNXB" name="nhaxuatban"
+                           placeholder="Nhập nhà xuất bản">
+                </div>
+                <div class="form-group">
+                    <label for="inputGia">Giá bán</label>
+                    <input type="number" class="form-control" id="inputGia" name="giaban" placeholder="Nhập giá bán">
+                </div>
+                <div class="form-group">
+                    <label for="inputMoTa">Mô tả</label>
+                    <textarea class="form-control" id="inputMoTa" name="mota" placeholder="Nhập mô tả" rows="4"></textarea>
+                </div>
+
+
+            </div>
+            <div class="col-6 border" style="padding: 0 20px 0 20px;">
+                <h4 class=""
+                    style="color: black; font-size: 26px; font-weight: bold; padding-top: 10px;">
+                    Hình ảnh
+                    sản phẩm
+                </h4>
+                <div class="d-flex justify-content-center mt-4">
+                    <img id="anhavatar" src="/img/book9.jpg" style="width: 150px; height: 200px; border-radius: 10px;"
+                         alt="Ảnh sách">
+                </div>
+                <div class="mt-4 file-upload d-flex justify-content-center align-items-center ">
+                    <input type="file" id="avatar" class="file-input" name="avatar" />
+                    <label for="avatar" class="button">
+                        Thêm ảnh 
+                    </label>
+                </div>
+                <h4 class=""
+                    style="color: black; font-size: 26px; font-weight: bold; padding-top: 10px;">
+                    Hình ảnh
+                    giới thiệu
+                </h4>
+                @* <div class="d-flex justify-content-center mt-4">
+                    <div id="preview-container" class="d-flex gap-3">
+                        <img id="preview1" name="preview1" class="preview-img" style="width: 80px; height: 100px; display: none;">
+                        <img id="preview2" name="preview2" class="preview-img" style="width: 80px; height: 100px; display: none;">
+                        <img id="preview3" name="preview3" class="preview-img" style="width: 80px; height: 100px; display: none;">
+                    </div>
+                </div>
+                <!-- Nút dành riêng cho hình ảnh giới thiệu -->
+                <div class="d-flex justify-content-center mt-3">
+                    <input type="file" id="file-input-preview" class="file-input"
+                           style="display: none;" />
+                    <button type="button" class="btn btn-primary"
+                            onclick="document.getElementById('file-input-preview').click();">
+                        Thêm ảnh1
+                    </button>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <input type="file" id="file-input-preview" class="file-input"
+                           style="display: none;" />
+                    <button type="button" class="btn btn-primary"
+                            onclick="document.getElementById('file-input-preview').click();">
+                        Thêm ảnh2
+                    </button>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <input type="file" id="file-input-preview" class="file-input"
+                           style="display: none;" />
+                    <button type="button" class="btn btn-primary"
+                            onclick="document.getElementById('file-input-preview').click();">
+                        Thêm ảnh3
+                    </button>
+                </div> *@
+                <div class="d-flex justify-content-center mt-4">
+                    <div id="preview-container" class="d-flex gap-3">
+                        <img id="preview1" name="preview1" class="preview-img" style="width: 80px; height: 100px; display: none;">
+                        <img id="preview2" name="preview2" class="preview-img" style="width: 80px; height: 100px; display: none;">
+                        <img id="preview3" name="preview3" class="preview-img" style="width: 80px; height: 100px; display: none;">
+                    </div>
+                </div>
+
+                <!-- Nút dành riêng cho hình ảnh giới thiệu -->
+                <div class="d-flex justify-content-center mt-3">
+                    <input type="file" id="file-input-preview1" name="anh1" class="file-input" style="display: none;" onchange="handleFileChange(1)" />
+                    <button type="button" class="btn btn-primary"  id="btn-add1" onclick="document.getElementById('file-input-preview1').click();">
+                        Thêm ảnh1
+                    </button>
+                </div>
+
+                <div class="d-flex justify-content-center mt-3">
+                    <input type="file" id="file-input-preview2" name="anh2" class="file-input" style="display: none;" onchange="handleFileChange(2)" />
+                    <button type="button" class="btn btn-primary"  id="btn-add2" onclick="document.getElementById('file-input-preview2').click();" style="display: none;">
+                        Thêm ảnh2
+                    </button>
+                </div>
+
+                <div class="d-flex justify-content-center mt-3">
+                    <input type="file" id="file-input-preview3" name="anh3" class="file-input" style="display: none;" onchange="handleFileChange(3)" />
+                    <button type="button" class="btn btn-primary"  id="btn-add3" onclick="document.getElementById('file-input-preview3').click();" style="display: none;">
+                        Thêm ảnh3
+                    </button>
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-primary mt-2 " style="width: 150px; margin-left: 300px;">Lưu thông tin</button>
+        </div>
+    </form>
+
+</div>
+@* <script>
+    document.getElementById('file-input-preview').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const previewImages = [document.getElementById('preview1'), document.getElementById('preview2'), document.getElementById('preview3')];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                for (let img of previewImages) {
+                    if (!img.src) {
+                        img.src = e.target.result;
+                        img.style.display = 'block';
+                        break;
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script> *@
+<script>
+    function handleFileChange(buttonNumber) {
+        var fileInput = document.getElementById(`file-input-preview${buttonNumber}`);
+        var preview = document.getElementById(`preview${buttonNumber}`);
+        var buttonAdd = document.getElementById(`btn-add${buttonNumber}`);
+
+        // Đọc file hình ảnh
+        var file = fileInput.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                preview.style.display = 'block';
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Ẩn nút hiện tại và hiển thị nút tiếp theo
+            buttonAdd.style.display = 'none';
+            if (buttonNumber < 3) {
+                document.getElementById(`btn-add${buttonNumber + 1}`).style.display = 'block';
+            }
+        }
+    }
+    document.getElementById('avatar').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const avatarImg = document.getElementById('anhavatar'); 
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                avatarImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file); 
+        }
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('#inputTheloai').select2({
+            placeholder: "Chọn thể loại",
+            allowClear: true
+        });
+    });
+</script>
+
