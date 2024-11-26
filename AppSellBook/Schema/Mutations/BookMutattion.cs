@@ -7,8 +7,9 @@ using AppSellBook.Services.Books;
 using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Services.Images;
+using AppSellBook.Services.PasswordHashers;
+using AppSellBook.Services.Users;
 using HotChocolate.Subscriptions;
-using Org.BouncyCastle.Crypto;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,15 +19,19 @@ public class BookMutation
     private readonly IImageRepository _imageRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ICommentationRepository _commentationRepository;
-    public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,ICategoryRepository categoryRepository,ICommentationRepository commentationRepository)
+    private readonly IUserRepository _userRepository;
+    private readonly IPasswordHashser _passwordHashser;
+    public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,IUserRepository userRepository ,IPasswordHashser passwordHashser)
     {
         _bookRepository = bookRepository;
         _imageRepository = imageRepository;
         _categoryRepository = categoryRepository;
         _commentationRepository = commentationRepository;
+        _userRepository = userRepository;
+        _passwordHashser = passwordHashser;
     }
     //Book
-    public async Task<BookResult> CreateBook(BookType bookTypeInput, [Service] ITopicEventSender topicEventSender)
+    public async Task<BookResult> CreateBook(BookInput bookTypeInput,int authorId, [Service] ITopicEventSender topicEventSender)
     {
         Book book = new Book()
         {
@@ -36,10 +41,12 @@ public class BookMutation
             sellPrice = bookTypeInput.sellPrice,
             quantity = bookTypeInput.quantity,
             description = bookTypeInput.description,
-            //author = bookTypeInput.author,
+            rank = bookTypeInput.rank,
+            authorId = authorId,
             
-           // List<int> ids,
-            //categories = ids.Select(id => new Category { categoryId = id }).ToList()
+
+            // List<int> ids,
+            //categories = categoryId.Select(id => new Category { categoryId = id }).ToList()
         };
         book = await _bookRepository.CreateBook(book);
 
@@ -190,4 +197,47 @@ public class BookMutation
     }
 
     //CartDetails
+
+    //User
+    public async Task<UserResult> Register(AppSellBook.Schema.Inputs.RegisterRequest registerRequest)
+    {
+        User userByUsername= await _userRepository.GetUserByName(registerRequest.Username);
+        if (userByUsername != null)
+        {
+            throw new Exception("Username is already exist");
+        }
+        string pass=_passwordHashser.HashPasswords(registerRequest.Password);
+        User user = new User()
+        {
+            username = registerRequest.Username,
+            password = pass,
+        };
+        user= await _userRepository.CreateUser(user);
+        return new UserResult()
+        {
+            username = user.username,
+            password = user.password,
+        };
+    }
+    public async Task<UserResult> Update(int userId,AppSellBook.Schema.Inputs.RegisterInfor registerInfor)
+    {
+
+        User user = new User()
+        {
+            userId= userId,
+            email=registerInfor.email,
+            gender=registerInfor.gender,
+            phone=registerInfor.phone,
+            firstName=registerInfor.firstName,
+            lastName=registerInfor.lastName,
+            purchaseAddress=registerInfor.purchaseAddress,
+            deliveryAddress=registerInfor.deliveryAddress,
+        };
+        user = await _userRepository.UpdateUser(user);
+        return new UserResult()
+        {
+            username = user.username,
+            password = user.password,
+        };
+    }
 }

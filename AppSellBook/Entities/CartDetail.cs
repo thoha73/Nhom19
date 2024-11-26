@@ -5,7 +5,7 @@ namespace AppSellBook.Entities
     public class CartDetail
     {
         [Key]
-        public int cardDetailId { get; set; }
+        public int cartDetailId { get; set; }
         public Book book { get; set; }
         public Cart cart { get; set; }
         public int cartId { get; set; }

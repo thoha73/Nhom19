@@ -18,9 +18,9 @@ namespace AppSellBook.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("AppSellBook.Entities.Author", b =>
                 {
@@ -28,18 +28,18 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("authorId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("authorId"));
 
                     b.Property<string>("authorName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("dateOfBirth")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("gender")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("authorId");
 
@@ -52,37 +52,37 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("bookId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("bookId"));
 
                     b.Property<string>("ISBN")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("authorId")
                         .HasColumnType("int");
 
                     b.Property<string>("bookName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("description")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("listedPrice")
-                        .HasColumnType("double");
+                        .HasColumnType("float");
 
                     b.Property<string>("publisher")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("quantity")
                         .HasColumnType("int");
 
                     b.Property<double>("rank")
-                        .HasColumnType("double");
+                        .HasColumnType("float");
 
                     b.Property<double>("sellPrice")
-                        .HasColumnType("double");
+                        .HasColumnType("float");
 
                     b.HasKey("bookId");
 
@@ -97,18 +97,18 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("cartId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("cartId"));
 
                     b.Property<DateTime>("createDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("deliveryAddress")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("purchaseAddress")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("userId")
                         .HasColumnType("int");
@@ -126,7 +126,7 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("cartDetailId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("cartDetailId"));
 
                     b.Property<int>("bookId")
                         .HasColumnType("int");
@@ -138,18 +138,13 @@ namespace AppSellBook.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("sellPrice")
-                        .HasColumnType("double");
-
-                    b.Property<int?>("userId")
-                        .HasColumnType("int");
+                        .HasColumnType("float");
 
                     b.HasKey("cartDetailId");
 
                     b.HasIndex("bookId");
 
                     b.HasIndex("cartId");
-
-                    b.HasIndex("userId");
 
                     b.ToTable("CartDetails");
                 });
@@ -160,11 +155,11 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("categoryId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("categoryId"));
 
                     b.Property<string>("categoryName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("categoryId");
 
@@ -177,17 +172,17 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("commentationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("commentationId"));
 
                     b.Property<int>("bookId")
                         .HasColumnType("int");
 
                     b.Property<string>("content")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("ranK")
-                        .HasColumnType("double");
+                        .HasColumnType("float");
 
                     b.Property<int>("userId")
                         .HasColumnType("int");
@@ -207,21 +202,21 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("imageId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("imageId"));
 
                     b.Property<int>("bookId")
                         .HasColumnType("int");
 
                     b.Property<bool>("icon")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.Property<byte[]>("imageData")
                         .IsRequired()
-                        .HasColumnType("longblob");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("imageName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("imageId");
 
@@ -236,28 +231,28 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("orderId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("orderId"));
 
                     b.Property<string>("deliveryAddress")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("deliveryDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("orderDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("orderStatus")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("paymentMethod")
                         .HasColumnType("int");
 
                     b.Property<string>("purchaseAddress")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("userId")
                         .HasColumnType("int");
@@ -275,7 +270,7 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("orderDetailId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("orderDetailId"));
 
                     b.Property<int>("bookId")
                         .HasColumnType("int");
@@ -287,7 +282,7 @@ namespace AppSellBook.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("sellPrice")
-                        .HasColumnType("double");
+                        .HasColumnType("float");
 
                     b.HasKey("orderDetailId");
 
@@ -304,11 +299,11 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("roleId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("roleId"));
 
                     b.Property<string>("roleName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("roleId");
 
@@ -321,46 +316,39 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("userId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("userId"));
 
                     b.Property<string>("deliveryAddress")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("firstName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("gender")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("lastName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("password")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("phone")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("point")
+                    b.Property<int?>("point")
                         .HasColumnType("int");
 
                     b.Property<string>("purchaseAddress")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("username")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("userId");
 
@@ -373,14 +361,14 @@ namespace AppSellBook.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("wishListId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("wishListId"));
 
                     b.Property<int>("userId")
                         .HasColumnType("int");
 
                     b.Property<string>("wishListName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("wishListId");
 
@@ -469,10 +457,6 @@ namespace AppSellBook.Migrations
                         .HasForeignKey("cartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("AppSellBook.Entities.User", null)
-                        .WithMany("cartDetails")
-                        .HasForeignKey("userId");
 
                     b.Navigation("book");
 
@@ -623,8 +607,6 @@ namespace AppSellBook.Migrations
 
             modelBuilder.Entity("AppSellBook.Entities.User", b =>
                 {
-                    b.Navigation("cartDetails");
-
                     b.Navigation("carts");
 
                     b.Navigation("commentations");

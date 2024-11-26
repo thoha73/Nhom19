@@ -11,8 +11,10 @@ namespace AppSellBook.Schema.Types
         public double listedPrice { get; set; }
         public double sellPrice { get; set; }
         public int quantity { get; set; }
+        public string publisher { get; set; }
         public string description { get; set; }
         public AuthorType author { get; set; }
+        public int authorId { get; set; }
         public double? rank { get; set; }
         public IEnumerable<ImageType> images { get; set; }
         public IEnumerable<CategoryType> categories { get; set; }

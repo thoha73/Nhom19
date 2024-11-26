@@ -36,6 +36,7 @@ namespace AppSellBook.Schema.Queries
                 sellPrice = b.sellPrice,
                 quantity = b.quantity,
                 description = b.description,
+                publisher=b.publisher,
                 author=b.author!=null?new AuthorType()
                 {
                     authorId=b.author.authorId,
@@ -74,6 +75,7 @@ namespace AppSellBook.Schema.Queries
                 sellPrice = b.sellPrice,
                 quantity = b.quantity,
                 description = b.description,
+                publisher = b.publisher,
                 author = b.author != null ? new AuthorType()
                 {
                     authorId = b.author.authorId,
@@ -112,6 +114,7 @@ namespace AppSellBook.Schema.Queries
                 sellPrice = bookDTO.sellPrice,
                 quantity = bookDTO.quantity,
                 description = bookDTO.description,
+                publisher = bookDTO.publisher,
                 author = bookDTO.author != null ? new AuthorType()
                 {
                     authorId = bookDTO.author.authorId,
@@ -177,7 +180,7 @@ namespace AppSellBook.Schema.Queries
             IEnumerable<CartDetail> cartDetailDTO= await _cartDetailRepository.GetBooksInCart(userId);
             return cartDetailDTO.Select(b => new CartDetailResult()
             {
-                cartDetailId = b.cardDetailId,
+                cartDetailId = b.cartDetailId,
                 quantity = b.quantity,
                 sellPrice = b.sellPrice,
                 book = new BookResult()

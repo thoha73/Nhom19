@@ -37,7 +37,9 @@ namespace AppSellBookMVC.Controllers
                             listedPrice
                             sellPrice
                             quantity
-                            author
+                            author{
+                                authorName
+                            }
                             rank
                             images {
                                 imageName

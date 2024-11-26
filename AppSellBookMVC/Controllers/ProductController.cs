@@ -61,9 +61,9 @@ namespace AppSellBookMVC.Controllers
                             isbn: ""{isbn}"",
                             listedPrice:0 ,
                             sellPrice: {giaban},
+                            publisher:""{nhaxuatban}"",
                             quantity: 100,
                             description: ""{mota}"",
-                            author: ""{tacgia}"",
                             rank: 5,
                             images: [
                                 {{
@@ -95,7 +95,7 @@ namespace AppSellBookMVC.Controllers
                                     bookId: 1
                                 }}
                             ]
-                        }}) {{
+                        }},authorId:1) {{
                             bookId
                         }}
                     }}"

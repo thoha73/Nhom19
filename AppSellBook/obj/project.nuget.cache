@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "Mrr4x8RckxLPpF/AZCEbYgeev5mdud7WkeGcgI5pxhiDVHUxLiLexpCytvurOH/u3trGJyxL3qYJULiy4dza4A==",
+  "dgSpecHash": "3KYqoAda+ElPw+AJ21QBe4Vr7uRHz5jDG9w2cEfreSH8IzNv/YYQZvsspnjrMHteqvdlAl97PsZqxotmEr+hMQ==",
   "success": true,
   "projectFilePath": "E:\\C#\\AppSellBook\\AppSellBook\\AppSellBook.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PC\\.nuget\\packages\\aspire.pomelo.entityframeworkcore.mysql\\9.0.0\\aspire.pomelo.entityframeworkcore.mysql.9.0.0.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
+    "C:\\Users\\PC\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\bouncycastle.cryptography\\2.3.1\\bouncycastle.cryptography.2.3.1.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\chillicream.nitro.app\\20.0.2\\chillicream.nitro.app.20.0.2.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\google.protobuf\\3.26.1\\google.protobuf.3.26.1.nupkg.sha512",

@@ -7,6 +7,7 @@ using AppSellBook.Services.CartDetails;
 using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Services.Images;
+using AppSellBook.Services.PasswordHashers;
 using AppSellBook.Services.Users;
 using HotChocolate.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -24,15 +25,13 @@ builder.Services.AddGraphQLServer().AddQueryType<BookQuery>()
                                     .AddInMemorySubscriptions()
                                     .AddSorting();
 
-builder.Services.AddPooledDbContextFactory<BookDBContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("BookDBContext"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookDBContext"))
-    )
-);
-
-
-
+//builder.Services.AddPooledDbContextFactory<BookDBContext>(options =>
+//    options.UseMySql(
+//        builder.Configuration.GetConnectionString("BookDBContext"),
+//        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookDBContext"))
+//    )
+//);
+builder.Services.AddPooledDbContextFactory<BookDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("BookDBContext")).LogTo(Console.WriteLine));
 
 builder.Services.AddCors(options =>
 {
@@ -48,6 +47,7 @@ builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICommentationRepository, CommentationRepository>();  
 builder.Services.AddScoped<ICartDetailRepository,CartDetailRepository>();
+builder.Services.AddSingleton<IPasswordHashser, BcryptPasswordHasher>();
 builder.Services.AddScoped<BookQuery>(); 
 builder.Services.AddScoped<CategoryQuery>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
