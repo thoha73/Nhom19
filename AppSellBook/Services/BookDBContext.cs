@@ -18,6 +18,7 @@ namespace AppSellBook.Services
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WishList> WishLists { get; set; }
+        public DbSet<RoleUser> RoleUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -118,20 +119,34 @@ namespace AppSellBook.Services
                 .HasMany(c => c.orders)
                 .WithOne(u => u.user)
                 .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<User>()
-                .HasMany(c => c.roles)
-                .WithMany(r => r.users)
-                .UsingEntity(j => j.ToTable("RoleUser"));
+
             modelBuilder.Entity<CartDetail>()
                 .HasOne(cd => cd.cart)
                 .WithMany(c => c.cartDetails)
                 .HasForeignKey(cd => cd.cartId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Role>()
-                .HasMany(u => u.users)
-                .WithMany(r => r.roles);
-                
+            modelBuilder.Entity<RoleUser>()
+                .HasKey(ru => new { ru.usersuserId, ru.rolesroleId });  // Khóa chính là sự kết hợp của UserId và RoleId
+
+            modelBuilder.Entity<RoleUser>()
+                .HasOne(ru => ru.User)
+                .WithMany(u => u.roleUsers) // User có nhiều RoleUser
+                .HasForeignKey(ru => ru.usersuserId);
+
+            modelBuilder.Entity<RoleUser>()
+                .HasOne(ru => ru.Role)
+                .WithMany(r => r.roleUsers) // Role có nhiều RoleUser
+                .HasForeignKey(ru => ru.rolesroleId);
+
+            //modelBuilder.Entity<Role>()
+            //    .HasMany(u => u.users)
+            //    .WithMany(r => r.roles);
+            //modelBuilder.Entity<User>()
+            //    .HasMany(c => c.roles)
+            //    .WithMany(r => r.users)
+            //    .UsingEntity(j => j.ToTable("RoleUser"));
+
         }
 
     }

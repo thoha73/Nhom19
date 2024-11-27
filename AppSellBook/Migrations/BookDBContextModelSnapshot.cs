@@ -310,6 +310,21 @@ namespace AppSellBook.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("AppSellBook.Entities.RoleUser", b =>
+                {
+                    b.Property<int>("usersuserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("rolesroleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("usersuserId", "rolesroleId");
+
+                    b.HasIndex("rolesroleId");
+
+                    b.ToTable("RoleUser");
+                });
+
             modelBuilder.Entity("AppSellBook.Entities.User", b =>
                 {
                     b.Property<int>("userId")
@@ -317,6 +332,9 @@ namespace AppSellBook.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("userId"));
+
+                    b.Property<DateTime?>("dateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("deliveryAddress")
                         .HasColumnType("nvarchar(max)");
@@ -405,21 +423,6 @@ namespace AppSellBook.Migrations
                     b.HasIndex("wishListswishListId");
 
                     b.ToTable("BookWishList", (string)null);
-                });
-
-            modelBuilder.Entity("RoleUser", b =>
-                {
-                    b.Property<int>("rolesroleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("usersuserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("rolesroleId", "usersuserId");
-
-                    b.HasIndex("usersuserId");
-
-                    b.ToTable("RoleUser", (string)null);
                 });
 
             modelBuilder.Entity("AppSellBook.Entities.Book", b =>
@@ -523,6 +526,25 @@ namespace AppSellBook.Migrations
                     b.Navigation("order");
                 });
 
+            modelBuilder.Entity("AppSellBook.Entities.RoleUser", b =>
+                {
+                    b.HasOne("AppSellBook.Entities.Role", "Role")
+                        .WithMany("roleUsers")
+                        .HasForeignKey("rolesroleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AppSellBook.Entities.User", "User")
+                        .WithMany("roleUsers")
+                        .HasForeignKey("usersuserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AppSellBook.Entities.WishList", b =>
                 {
                     b.HasOne("AppSellBook.Entities.User", "user")
@@ -564,21 +586,6 @@ namespace AppSellBook.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RoleUser", b =>
-                {
-                    b.HasOne("AppSellBook.Entities.Role", null)
-                        .WithMany()
-                        .HasForeignKey("rolesroleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AppSellBook.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("usersuserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AppSellBook.Entities.Author", b =>
                 {
                     b.Navigation("books");
@@ -605,6 +612,11 @@ namespace AppSellBook.Migrations
                     b.Navigation("orderDetails");
                 });
 
+            modelBuilder.Entity("AppSellBook.Entities.Role", b =>
+                {
+                    b.Navigation("roleUsers");
+                });
+
             modelBuilder.Entity("AppSellBook.Entities.User", b =>
                 {
                     b.Navigation("carts");
@@ -612,6 +624,8 @@ namespace AppSellBook.Migrations
                     b.Navigation("commentations");
 
                     b.Navigation("orders");
+
+                    b.Navigation("roleUsers");
 
                     b.Navigation("wishLists");
                 });

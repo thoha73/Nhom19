@@ -211,3 +211,4 @@ E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\refint\AppSellBook.dll
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\AppSellBook.pdb
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\AppSellBook.genruntimeconfig.cache
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\ref\AppSellBook.dll
+E:\C#\AppSellBook\AppSellBook\bin\Release\net8.0\BCrypt.Net-Next.dll

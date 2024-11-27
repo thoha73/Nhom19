@@ -13,5 +13,6 @@
         public int point { get; set; }
         public string purchaseAddress { get; set; }
         public string deliveryAddress { get; set; }
+        public List<RoleUserResult> roleUsers { get; set; }
     }
 }

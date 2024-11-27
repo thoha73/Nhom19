@@ -8,6 +8,7 @@ using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Services.Images;
 using AppSellBook.Services.PasswordHashers;
+using AppSellBook.Services.Roles;
 using AppSellBook.Services.Users;
 using HotChocolate.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,8 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICommentationRepository, CommentationRepository>();  
 builder.Services.AddScoped<ICartDetailRepository,CartDetailRepository>();
 builder.Services.AddSingleton<IPasswordHashser, BcryptPasswordHasher>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IRoleUserRepository, RoleUserRepository>();
 builder.Services.AddScoped<BookQuery>(); 
 builder.Services.AddScoped<CategoryQuery>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -62,8 +65,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UsePlayground();
+}else
+{
+    // In production, you might want to show a generic error page.
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts(); // Kích hoạt HTTP Strict Transport Security
 }
 
 app.UseHttpsRedirection();

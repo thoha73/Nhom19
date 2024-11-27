@@ -7,6 +7,7 @@ E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\AppSellBook.pdb
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\Aspire.Pomelo.EntityFrameworkCore.MySql.dll
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\Azure.Core.dll
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\Azure.Identity.dll
+E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\BCrypt.Net-Next.dll
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\BouncyCastle.Cryptography.dll
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\ChilliCream.Nitro.App.dll
 E:\C#\AppSellBook\AppSellBook\obj\Release\net8.0\PubTmp\Out\Google.Protobuf.dll

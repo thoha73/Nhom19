@@ -8,6 +8,7 @@ using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Services.Images;
 using AppSellBook.Services.PasswordHashers;
+using AppSellBook.Services.Roles;
 using AppSellBook.Services.Users;
 using HotChocolate.Subscriptions;
 using System.Collections.Generic;
@@ -21,7 +22,9 @@ public class BookMutation
     private readonly ICommentationRepository _commentationRepository;
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHashser _passwordHashser;
-    public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,IUserRepository userRepository ,IPasswordHashser passwordHashser)
+    private readonly IRoleRepository _roleRepository;
+    private readonly IRoleUserRepository _roleUserRepository;
+    public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,IUserRepository userRepository ,IPasswordHashser passwordHashser,IRoleRepository roleRepository, IRoleUserRepository roleUserRepository)
     {
         _bookRepository = bookRepository;
         _imageRepository = imageRepository;
@@ -29,6 +32,8 @@ public class BookMutation
         _commentationRepository = commentationRepository;
         _userRepository = userRepository;
         _passwordHashser = passwordHashser;
+        _roleRepository=roleRepository;
+        _roleUserRepository = roleUserRepository;
     }
     //Book
     public async Task<BookResult> CreateBook(BookInput bookTypeInput,int authorId, [Service] ITopicEventSender topicEventSender)
@@ -204,8 +209,15 @@ public class BookMutation
         User userByUsername= await _userRepository.GetUserByName(registerRequest.Username);
         if (userByUsername != null)
         {
-            throw new Exception("Username is already exist");
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Tài khoản đã tồn tại. Vui lòng nhập tài khoản khác",
+                Details = "Lỗi khi đã tồn tại 1 tài khoản"
+            };
+            throw new GraphQLException(errorResponse.Message);
         }
+        var role = await _roleRepository.GetRoleById(1);
         string pass=_passwordHashser.HashPasswords(registerRequest.Password);
         User user = new User()
         {
@@ -213,8 +225,15 @@ public class BookMutation
             password = pass,
         };
         user= await _userRepository.CreateUser(user);
+        RoleUser roleUser = new RoleUser()
+        {
+            usersuserId = user.userId,
+            rolesroleId = role.roleId
+        };
+        roleUser= await _roleUserRepository.CreateRoleUser(roleUser);
         return new UserResult()
         {
+            userId=user.userId,
             username = user.username,
             password = user.password,
         };
@@ -230,6 +249,8 @@ public class BookMutation
             phone=registerInfor.phone,
             firstName=registerInfor.firstName,
             lastName=registerInfor.lastName,
+            dateOfBirth=registerInfor.dateOfBirth,
+            point=0,
             purchaseAddress=registerInfor.purchaseAddress,
             deliveryAddress=registerInfor.deliveryAddress,
         };
@@ -238,6 +259,40 @@ public class BookMutation
         {
             username = user.username,
             password = user.password,
+        };
+    }
+    public async Task<UserResult> Login(AppSellBook.Schema.Inputs.LoginRequest loginRequest)
+    {
+        User userByUsername = await _userRepository.GetUserByName(loginRequest.username);
+        if (userByUsername == null)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Tài khoản không tồn tại!",
+                Details = "Lỗi khi tìm kiếm tài khoản theo username."
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        bool isCorrectPass=_passwordHashser.VerifyPassword(loginRequest.password, userByUsername.password);
+        if(!isCorrectPass)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Mật khẩu không đúng!",
+                Details = "Lỗi khi kiểm tra mật khẩu."
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        return new UserResult()
+        {
+            userId = userByUsername.userId,
+            username = userByUsername.username,
+            roleUsers=userByUsername.roleUsers.Select(r=>new RoleUserResult
+            {
+                rolesroleId=r.rolesroleId
+            }).ToList(),
         };
     }
 }

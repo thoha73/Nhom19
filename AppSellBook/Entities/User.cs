@@ -10,12 +10,13 @@ namespace AppSellBook.Entities
         public string? gender { get; set; }
         public string? phone {  get; set; }
         public string? email { get; set; }
+        public DateTime? dateOfBirth { get; set; }
         public string? lastName { get; set; }
         public string? firstName { get; set; }
         public int? point {  get; set; }
         public string? purchaseAddress { get; set; }
         public string? deliveryAddress { get; set; }
-        public IEnumerable<Role> roles { get; set; }
+        public IEnumerable<RoleUser> roleUsers { get; set; }
         public IEnumerable<Cart> carts { get; set; }
         public IEnumerable<Order> orders { get; set; }
         public IEnumerable<WishList> wishLists { get; set; }

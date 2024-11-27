@@ -4,6 +4,7 @@ namespace AppSellBook.Schema.Inputs
 {
     public class RegisterInfor
     {
+        public DateTime dateOfBirth {  get; set; }
         public string gender { get; set; }
         public string email { get; set; }
         public string phone { get; set; }
