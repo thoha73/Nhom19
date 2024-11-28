@@ -104,6 +104,7 @@ namespace AppSellBook.Services.Users
                 var useExist= await context.Users.FindAsync(user.userId);
                 if (useExist != null)
                 {
+                    useExist.password = user.password;
                     useExist.phone = useExist.phone == null ? user.phone : useExist.phone;
                     useExist.purchaseAddress = useExist.purchaseAddress == null ? user.purchaseAddress : useExist.purchaseAddress;
                     useExist.deliveryAddress = useExist.deliveryAddress == null ? user.deliveryAddress : useExist.deliveryAddress;
@@ -113,6 +114,19 @@ namespace AppSellBook.Services.Users
                     useExist.gender = useExist.gender == null ? user.gender : useExist.gender;
                     useExist.email = useExist.email == null ? user.email : useExist.email;
                     useExist.point= useExist.point == null ?0 : useExist.point;
+                }
+                await context.SaveChangesAsync();
+                return useExist;
+            }
+        }
+        public async Task<User> UpdatePass(User user)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                var useExist = await context.Users.FindAsync(user.userId);
+                if (useExist != null)
+                {
+                    useExist.password = user.password;
                 }
                 await context.SaveChangesAsync();
                 return useExist;

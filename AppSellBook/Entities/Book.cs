@@ -17,7 +17,7 @@
         public IEnumerable<Image> images { get; set; }
         public IEnumerable<CartDetail> cartDetails { get; set; }
         public IEnumerable<OrderDetail> orderDetails { get; set; }
-        public IEnumerable<WishList> wishLists { get; set; }
+        public IEnumerable<BookWishList> bookWishLists { get; set; }
         public IEnumerable<Commentation> commentations { get; set; }
 
     }

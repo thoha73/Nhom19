@@ -19,6 +19,7 @@ namespace AppSellBook.Services
         public DbSet<User> Users { get; set; }
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<RoleUser> RoleUser { get; set; }
+        public DbSet<BookWishList> BookWishList { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,10 +66,7 @@ namespace AppSellBook.Services
                 .WithOne(b=>b.book)
                 .HasForeignKey(c=>c.bookId)
                 .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Book>()
-                .HasMany(w => w.wishLists)
-                .WithMany(b => b.books)
-                .UsingEntity(j => j.ToTable("BookWishList"));
+
 
             modelBuilder.Entity<Book>()
                 .HasOne(a => a.author)
@@ -146,7 +144,20 @@ namespace AppSellBook.Services
             //    .HasMany(c => c.roles)
             //    .WithMany(r => r.users)
             //    .UsingEntity(j => j.ToTable("RoleUser"));
-
+            //modelBuilder.Entity<Book>()
+            //    .HasMany(w => w.wishLists)
+            //    .WithMany(b => b.books)
+            //    .UsingEntity(j => j.ToTable("BookWishList"));
+            modelBuilder.Entity<BookWishList>()
+                .HasKey(bw => new { bw.booksbookId, bw.wishListswishListId });
+            modelBuilder.Entity<BookWishList>()
+                .HasOne(bw => bw.book)
+                .WithMany(b => b.bookWishLists)
+                .HasForeignKey(bw => bw.booksbookId);
+            modelBuilder.Entity<BookWishList>()
+                .HasOne(bw => bw.wishList)
+                .WithMany(b => b.bookWishLists)
+                .HasForeignKey(bw => bw.wishListswishListId);
         }
 
     }

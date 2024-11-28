@@ -6,5 +6,8 @@ namespace AppSellBook.Services.CartDetails
     {
         Task<IEnumerable<CartDetail>> GetBooksInCart(int userId);
 
+        Task<CartDetail> CreateCartDetail(CartDetail cartDetail);
+        Task<bool> existsInCart(int cartId, int bookId);
+
     }
 }

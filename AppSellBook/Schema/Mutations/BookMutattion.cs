@@ -4,12 +4,14 @@ using AppSellBook.Schema.Results;
 using AppSellBook.Schema.Subscriptions;
 using AppSellBook.Schema.Types;
 using AppSellBook.Services.Books;
+using AppSellBook.Services.CartDetails;
 using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Services.Images;
 using AppSellBook.Services.PasswordHashers;
 using AppSellBook.Services.Roles;
 using AppSellBook.Services.Users;
+using AppSellBook.Services.WishLists;
 using HotChocolate.Subscriptions;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +26,15 @@ public class BookMutation
     private readonly IPasswordHashser _passwordHashser;
     private readonly IRoleRepository _roleRepository;
     private readonly IRoleUserRepository _roleUserRepository;
-    public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,IUserRepository userRepository ,IPasswordHashser passwordHashser,IRoleRepository roleRepository, IRoleUserRepository roleUserRepository)
+    private readonly IWishListRepository _wishListRepository;
+    private readonly IBookWishListRepository _bookWishListRepository;
+    private readonly ICartRepository _cartRepository;
+    private readonly ICartDetailRepository _cartDetailRepository;
+    public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,
+                        ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,
+                        IUserRepository userRepository ,IPasswordHashser passwordHashser,IRoleRepository roleRepository,
+                        IRoleUserRepository roleUserRepository, IWishListRepository wishListRepository, IBookWishListRepository bookWishListRepository,
+                        ICartRepository cartRepository,ICartDetailRepository cartDetailRepository)
     {
         _bookRepository = bookRepository;
         _imageRepository = imageRepository;
@@ -34,6 +44,10 @@ public class BookMutation
         _passwordHashser = passwordHashser;
         _roleRepository=roleRepository;
         _roleUserRepository = roleUserRepository;
+        _wishListRepository = wishListRepository;
+        _bookWishListRepository = bookWishListRepository;
+        _cartRepository = cartRepository;
+        _cartDetailRepository = cartDetailRepository;
     }
     //Book
     public async Task<BookResult> CreateBook(BookInput bookTypeInput,int authorId, [Service] ITopicEventSender topicEventSender)
@@ -289,10 +303,142 @@ public class BookMutation
         {
             userId = userByUsername.userId,
             username = userByUsername.username,
+            lastName=userByUsername.lastName,
             roleUsers=userByUsername.roleUsers.Select(r=>new RoleUserResult
             {
                 rolesroleId=r.rolesroleId
             }).ToList(),
         };
+    }
+    public async Task<UserResult> GetPass(string username)
+    {
+        User user= await _userRepository.GetUserByName(username);
+        if(user == null)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Tài khoản không tồn tại!",
+                Details = "Lỗi khi tìm kiếm tài khoản theo username."
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+
+        return new UserResult()
+        {
+            userId = user.userId,
+            username = user.username,
+        };
+    }
+    public async Task<UserResult> UpdatePass(string username,string pass) {
+        User user = await _userRepository.GetUserByName(username);
+        user.password= _passwordHashser.HashPasswords(pass);
+        user= await _userRepository.UpdatePass(user);
+        return new UserResult()
+        {
+            userId = user.userId,
+            username = user.username,
+        };
+    }
+    //WishList
+    public async Task<WishListResult> AddWishlist(int userId,int bookId)
+    {
+        WishList wishListExist = await _wishListRepository.GetWishListByUserId(userId);
+        if(wishListExist == null)
+        {
+            WishList wishList = new WishList()
+            {
+                userId = userId,
+                wishListName = "Danh sách yêu thích"
+            };
+            wishListExist = await _wishListRepository.CreateWishList(wishList);
+        }
+        Book book = await _bookRepository.GetBookById(bookId);
+        if(book == null)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Sách không tồn tại",
+                Details = "Lỗi khi thêm sách vào Wishlist"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        bool exists = await _bookWishListRepository.existsInBookWishList(wishListExist.wishListId, book.bookId);
+        if (exists)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Sách đã tồn tại trong danh sách yêu thích",
+                Details = "Sách này đã có trong Wishlist của bạn"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        BookWishList bookWishList = new BookWishList()
+        {
+            wishListswishListId = wishListExist.wishListId,
+            booksbookId = book.bookId
+        };
+        bookWishList= await _bookWishListRepository.CreateBookWishList(bookWishList);
+        return new WishListResult()
+        {
+            wishListId = wishListExist.wishListId,
+            userId = wishListExist.userId,
+            wishListName = wishListExist.wishListName
+        };
+    }
+    public async Task<CartResult> AddCart(int userId, int bookId)
+    {
+        User user= await _userRepository.GetUserById(userId);
+        Cart cartExist= await _cartRepository.GetCartByUserId(userId);
+        if (cartExist == null)
+        {
+            Cart cart = new Cart()
+            {
+                userId= userId,
+                createDate = DateTime.Now,
+                deliveryAddress=user.deliveryAddress,
+                purchaseAddress=user.purchaseAddress
+            };
+            cartExist=await _cartRepository.CreateCard(cart);
+        }
+        Book book= await _bookRepository.GetBookById(bookId);
+        if(book == null)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Sách không tồn tại",
+                Details = "Lỗi khi thêm sách vào Wishlist"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        bool exists = await _cartDetailRepository.existsInCart(cartExist.cartId, book.bookId);
+        if (exists)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Sách đã tồn tại trong giỏ hàng",
+                Details = "Sách này đã có trong Cart của bạn"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        CartDetail cartDetail = new CartDetail()
+        {
+            cartId = cartExist.cartId,
+            bookId = book.bookId,
+            quantity = 1,
+            sellPrice = book.sellPrice,
+        };
+        cartDetail= await _cartDetailRepository.CreateCartDetail(cartDetail);
+        return new CartResult()
+        {
+            createDate = cartExist.createDate,
+            userId = cartExist.userId,
+            cartId = cartExist.cartId,
+        };
+
     }
 }
