@@ -10,5 +10,6 @@ namespace AppSellBook.Services.Users
         Task<User> CreateUser(User user);
         Task<User> UpdateUser(User user);
         Task<bool> DeleteUser(int userId);
+        Task<User> UpdatePass(User user);
     }
 }

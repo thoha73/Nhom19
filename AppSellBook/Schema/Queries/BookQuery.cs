@@ -6,6 +6,9 @@ using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Schema.Results;
 using AppSellBook.Services.CartDetails;
+using AppSellBook.Services.WishLists;
+using AppSellBook.Services.Users;
+using AppSellBook.Services.OrderDetails;
 
 namespace AppSellBook.Schema.Queries
 {
@@ -15,12 +18,18 @@ namespace AppSellBook.Schema.Queries
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICommentationRepository _commentationRepository;
         private readonly ICartDetailRepository _cartDetailRepository;
-        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository, ICartDetailRepository cartDetailRepository)
+        private readonly IWishListRepository _wishListRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IOrderDetailRepository _orderDetailRepository;
+        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository, ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository,IOrderDetailRepository orderDetailRepository)
         {
             _bookRepository = bookRepository;
             _categoryRepository = categoryRepository;
             _commentationRepository = commentationRepository;
             _cartDetailRepository = cartDetailRepository;
+            _wishListRepository = wishListRepository;
+            _userRepository = userRepository;
+            _orderDetailRepository = orderDetailRepository;
         }
         //Books
         [UseSorting]
@@ -196,6 +205,78 @@ namespace AppSellBook.Schema.Queries
 
                 }
             }).ToList() ;
+        }
+        public async Task<IEnumerable<BookResult>> GetBookNotComment(int userId)
+        {
+            IEnumerable<Book> books=await _orderDetailRepository.GetBookNotCommentByUser(userId);
+            return books.Select(b => new BookResult()
+            {
+                bookId = b.bookId,
+                bookName = b.bookName,
+                images = b.images
+                .Where(i => i.icon == true)
+                .Select(i => new ImageResult()
+                {
+                    imageName = i.imageName,
+                    imageData = Convert.ToBase64String(i.imageData),
+                }).ToList(),
+            }).ToList();
+        }
+        public async Task<int> GetBookCountInCart(int userId)
+        {
+            return await _cartDetailRepository.GetBookCountInCart(userId);
+        }
+        //WishLists
+        public async Task<IEnumerable<BookResult>> GetWishListForUser(int userId)
+        {
+            IEnumerable<WishList> wishLists = await _wishListRepository.GetAllWishListForUser(userId);
+
+            // Chuyển đổi danh sách sách yêu thích thành BookResult
+            var bookResults = wishLists
+            .SelectMany(w => w.bookWishLists)  // Dùng SelectMany để lấy tất cả các sách trong danh sách yêu thích
+            .Select(bw => new BookResult()
+            {
+                bookId = bw.book.bookId,  // Lấy bookId từ book trong BookWishList
+                bookName = bw.book.bookName,
+                images = bw.book.images != null  // Kiểm tra xem images có null không
+                ? bw.book.images
+                    .Where(i => i.icon == true)
+                    .Select(i => new ImageResult()
+                    {
+                        imageName = i.imageName,
+                        imageData = Convert.ToBase64String(i.imageData),
+                        icon = i.icon
+                    }).ToList()
+                : new List<ImageResult>(),
+                author = bw.book.author != null  
+                ? new AuthorResult()
+                {
+                    authorId = bw.book.author.authorId,
+                    authorName = bw.book.author.authorName
+                }
+                : null,
+                description = bw.book.description,
+                rank = bw.book.rank,
+                listedPrice = bw.book.listedPrice,
+                sellPrice = bw.book.sellPrice
+            }).ToList();
+            return bookResults;
+        }
+        //User
+        public async Task<UserResult> GetUserById(int userId)
+        {
+            User userDTO= await _userRepository.GetUserById(userId);
+            return new UserResult()
+            {
+                firstName = userDTO.firstName,
+                lastName = userDTO.lastName,
+                email = userDTO.email,
+                gender = userDTO.gender,
+                phone = userDTO.phone,
+                purchaseAddress = userDTO.purchaseAddress,
+                deliveryAddress = userDTO.deliveryAddress,
+                point = userDTO.point,
+            };
         }
     }
 }
