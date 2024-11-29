@@ -56,8 +56,11 @@ builder.Services.AddSingleton<IPasswordHashser, BcryptPasswordHasher>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleUserRepository, RoleUserRepository>();
 builder.Services.AddScoped<IWishListRepository, WishListRepository>();
+<<<<<<< HEAD
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
 builder.Services.AddScoped<IBookWishListRepository, BookWishListRepository>();
 builder.Services.AddScoped<BookQuery>(); 
 builder.Services.AddScoped<CategoryQuery>();

@@ -6,6 +6,9 @@ namespace AppSellBook.Services.CartDetails
     {
         Task<Cart> GetCartByUserId(int userId);
         Task<Cart> CreateCard(Cart cart);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
     }
 }

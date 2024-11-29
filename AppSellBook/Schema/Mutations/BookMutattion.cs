@@ -32,13 +32,20 @@ public class BookMutation
     private readonly IBookWishListRepository _bookWishListRepository;
     private readonly ICartRepository _cartRepository;
     private readonly ICartDetailRepository _cartDetailRepository;
+<<<<<<< HEAD
     private readonly IOrderRepository _orderRepository;
     private readonly IOrderDetailRepository _orderDetailRepository;
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
     public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,
                         ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,
                         IUserRepository userRepository ,IPasswordHashser passwordHashser,IRoleRepository roleRepository,
                         IRoleUserRepository roleUserRepository, IWishListRepository wishListRepository, IBookWishListRepository bookWishListRepository,
+<<<<<<< HEAD
                         ICartRepository cartRepository,ICartDetailRepository cartDetailRepository,IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository)
+=======
+                        ICartRepository cartRepository,ICartDetailRepository cartDetailRepository)
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
     {
         _bookRepository = bookRepository;
         _imageRepository = imageRepository;
@@ -52,8 +59,11 @@ public class BookMutation
         _bookWishListRepository = bookWishListRepository;
         _cartRepository = cartRepository;
         _cartDetailRepository = cartDetailRepository;
+<<<<<<< HEAD
         _orderRepository = orderRepository;
         _orderDetailRepository= orderDetailRepository;
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
     }
     //Book
     public async Task<BookResult> CreateBook(BookInput bookTypeInput,int authorId, [Service] ITopicEventSender topicEventSender)
@@ -346,7 +356,11 @@ public class BookMutation
             username = user.username,
         };
     }
+<<<<<<< HEAD
     //WishLists
+=======
+    //WishList
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
     public async Task<WishListResult> AddWishlist(int userId,int bookId)
     {
         WishList wishListExist = await _wishListRepository.GetWishListByUserId(userId);
@@ -394,7 +408,10 @@ public class BookMutation
             wishListName = wishListExist.wishListName
         };
     }
+<<<<<<< HEAD
     //Carts
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
     public async Task<CartResult> AddCart(int userId, int bookId)
     {
         User user= await _userRepository.GetUserById(userId);
@@ -448,6 +465,7 @@ public class BookMutation
         };
 
     }
+<<<<<<< HEAD
     //Orders
     public async Task<OrderResult> AddOrder(int userId)
     {
@@ -478,4 +496,6 @@ public class BookMutation
             orderId = order.orderId,
         };
     }
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
 }

@@ -8,7 +8,10 @@ using AppSellBook.Schema.Results;
 using AppSellBook.Services.CartDetails;
 using AppSellBook.Services.WishLists;
 using AppSellBook.Services.Users;
+<<<<<<< HEAD
 using AppSellBook.Services.OrderDetails;
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
 
 namespace AppSellBook.Schema.Queries
 {
@@ -20,8 +23,12 @@ namespace AppSellBook.Schema.Queries
         private readonly ICartDetailRepository _cartDetailRepository;
         private readonly IWishListRepository _wishListRepository;
         private readonly IUserRepository _userRepository;
+<<<<<<< HEAD
         private readonly IOrderDetailRepository _orderDetailRepository;
         public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository, ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository,IOrderDetailRepository orderDetailRepository)
+=======
+        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository, ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository)
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
         {
             _bookRepository = bookRepository;
             _categoryRepository = categoryRepository;
@@ -29,7 +36,10 @@ namespace AppSellBook.Schema.Queries
             _cartDetailRepository = cartDetailRepository;
             _wishListRepository = wishListRepository;
             _userRepository = userRepository;
+<<<<<<< HEAD
             _orderDetailRepository = orderDetailRepository;
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
         }
         //Books
         [UseSorting]
@@ -206,6 +216,7 @@ namespace AppSellBook.Schema.Queries
                 }
             }).ToList() ;
         }
+<<<<<<< HEAD
         public async Task<IEnumerable<BookResult>> GetBookNotComment(int userId)
         {
             IEnumerable<Book> books=await _orderDetailRepository.GetBookNotCommentByUser(userId);
@@ -226,6 +237,8 @@ namespace AppSellBook.Schema.Queries
         {
             return await _cartDetailRepository.GetBookCountInCart(userId);
         }
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
         //WishLists
         public async Task<IEnumerable<BookResult>> GetWishListForUser(int userId)
         {

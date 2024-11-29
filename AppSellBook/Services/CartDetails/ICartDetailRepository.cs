@@ -9,5 +9,8 @@ namespace AppSellBook.Services.CartDetails
         Task<CartDetail> CreateCartDetail(CartDetail cartDetail);
         Task<bool> existsInCart(int cartId, int bookId);
 
+        Task<CartDetail> CreateCartDetail(CartDetail cartDetail);
+        Task<bool> existsInCart(int cartId, int bookId);
+
     }
 }

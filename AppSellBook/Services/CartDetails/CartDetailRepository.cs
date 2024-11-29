@@ -30,6 +30,7 @@ namespace AppSellBook.Services.CartDetails
             }
         }
 
+<<<<<<< HEAD
         public async Task<int> GetBookCountInCart(int userId)
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
@@ -39,6 +40,8 @@ namespace AppSellBook.Services.CartDetails
             }
         }
 
+=======
+>>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
         public async Task<IEnumerable<CartDetail>> GetBooksInCart(int userId)
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
