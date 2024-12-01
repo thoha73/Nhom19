@@ -104,7 +104,6 @@ namespace AppSellBook.Services.Users
                 var useExist= await context.Users.FindAsync(user.userId);
                 if (useExist != null)
                 {
-                    useExist.password = user.password;
                     useExist.phone = useExist.phone == null ? user.phone : useExist.phone;
                     useExist.purchaseAddress = useExist.purchaseAddress == null ? user.purchaseAddress : useExist.purchaseAddress;
                     useExist.deliveryAddress = useExist.deliveryAddress == null ? user.deliveryAddress : useExist.deliveryAddress;
@@ -114,6 +113,42 @@ namespace AppSellBook.Services.Users
                     useExist.gender = useExist.gender == null ? user.gender : useExist.gender;
                     useExist.email = useExist.email == null ? user.email : useExist.email;
                     useExist.point= useExist.point == null ?0 : useExist.point;
+                }
+                await context.SaveChangesAsync();
+                return useExist;
+            }
+        }
+        public async Task<User> UpdateUser2(User user)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                var useExist = await context.Users.FindAsync(user.userId);
+                if (useExist != null)
+                {
+                    useExist.phone = user.phone == null ? useExist.phone : user.phone;
+                    useExist.purchaseAddress = user.purchaseAddress == null ? useExist.purchaseAddress : user.purchaseAddress;
+                    useExist.deliveryAddress = user.deliveryAddress;
+                    useExist.dateOfBirth = user.dateOfBirth;
+                    useExist.lastName = user.lastName == null ? useExist.lastName : user.lastName;
+                    useExist.firstName = user.firstName == null ? useExist.firstName : user.firstName;
+                    useExist.gender = user.gender;
+                    useExist.email = user.email;
+                    useExist.point = user.point == null ? 0 : user.point;
+                }
+                context.Users.Update(useExist);
+                await context.SaveChangesAsync();
+                return user;
+            }
+        }
+        public async Task<User> UpdatePassword(User user)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                var useExist = await context.Users.FindAsync(user.userId);
+                if (useExist != null)
+                {
+                    useExist.password = user.password;
+
                 }
                 await context.SaveChangesAsync();
                 return useExist;

@@ -10,6 +10,7 @@
         public string email { get; set; }
         public string lastName { get; set; }
         public string firstName { get; set; }
+        public DateTime? dateOfBirth { get; set; }
         public int? point { get; set; }
         public string purchaseAddress { get; set; }
         public string deliveryAddress { get; set; }

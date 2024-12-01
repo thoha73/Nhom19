@@ -11,5 +11,6 @@ namespace AppSellBook.Schema.Results
         public int bookId { get; set; }
         public int quantity { get; set; }
         public double sellPrice { get; set; }
+        public bool isSelected { get; set; }    
     }
 }

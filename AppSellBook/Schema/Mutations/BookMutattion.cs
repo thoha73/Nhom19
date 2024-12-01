@@ -32,20 +32,15 @@ public class BookMutation
     private readonly IBookWishListRepository _bookWishListRepository;
     private readonly ICartRepository _cartRepository;
     private readonly ICartDetailRepository _cartDetailRepository;
-<<<<<<< HEAD
     private readonly IOrderRepository _orderRepository;
     private readonly IOrderDetailRepository _orderDetailRepository;
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+    private readonly IBookCategoryRepository _bookCategoryRepository;
     public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,
                         ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,
                         IUserRepository userRepository ,IPasswordHashser passwordHashser,IRoleRepository roleRepository,
                         IRoleUserRepository roleUserRepository, IWishListRepository wishListRepository, IBookWishListRepository bookWishListRepository,
-<<<<<<< HEAD
-                        ICartRepository cartRepository,ICartDetailRepository cartDetailRepository,IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository)
-=======
-                        ICartRepository cartRepository,ICartDetailRepository cartDetailRepository)
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+                        ICartRepository cartRepository,ICartDetailRepository cartDetailRepository,IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository,
+                        IBookCategoryRepository bookCategoryRepository)
     {
         _bookRepository = bookRepository;
         _imageRepository = imageRepository;
@@ -59,14 +54,13 @@ public class BookMutation
         _bookWishListRepository = bookWishListRepository;
         _cartRepository = cartRepository;
         _cartDetailRepository = cartDetailRepository;
-<<<<<<< HEAD
         _orderRepository = orderRepository;
         _orderDetailRepository= orderDetailRepository;
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+        _bookCategoryRepository = bookCategoryRepository;
+
     }
     //Book
-    public async Task<BookResult> CreateBook(BookInput bookTypeInput,int authorId, [Service] ITopicEventSender topicEventSender)
+    public async Task<BookResult> CreateBook(BookInput bookTypeInput,int authorId,List<int> categoryIds ,[Service] ITopicEventSender topicEventSender)
     {
         Book book = new Book()
         {
@@ -76,15 +70,20 @@ public class BookMutation
             sellPrice = bookTypeInput.sellPrice,
             quantity = bookTypeInput.quantity,
             description = bookTypeInput.description,
+            publisher= bookTypeInput.publisher,
             rank = bookTypeInput.rank,
             authorId = authorId,
-            
-
-            // List<int> ids,
-            //categories = categoryId.Select(id => new Category { categoryId = id }).ToList()
         };
         book = await _bookRepository.CreateBook(book);
-
+        foreach (int categoryId in categoryIds)
+        {
+            BookCategory bookCategory = new BookCategory()
+            {
+                categoriescategoryId = categoryId,
+                booksbookId = book.bookId,
+            };
+            bookCategory = await _bookCategoryRepository.CreateBookCategory(bookCategory);
+        }      
         if (bookTypeInput.images != null && bookTypeInput.images.Any())
         {
             foreach (var imageType in bookTypeInput.images)
@@ -111,7 +110,6 @@ public class BookMutation
             sellPrice = book.sellPrice,
             quantity = book.quantity,
             description = book.description,
-            //author = book.author,
             images = bookTypeInput.images?.Select(i => new ImageResult
             {
                 imageName = i.imageName,
@@ -173,6 +171,10 @@ public class BookMutation
         };
         return bookResult;
     }
+    public async Task<bool> DeleteBooks(List<int> bookIds)
+    {
+        return await _bookRepository.DeleteBooksAsync(bookIds);
+    }
     //Category
     public async Task<CategoryResult> CreateCategory(CategoryType categoryType, [Service] ITopicEventSender topicEventSender)
     {
@@ -208,10 +210,7 @@ public class BookMutation
     {
         return await _categoryRepository.DeleteCategory(id);
     }
-    public async Task<bool> DeleteBooks(List<int> bookIds)
-    {
-        return await _bookRepository.DeleteBooksAsync(bookIds);
-    }
+
     //Commentations
     public async Task<CommentationResult> CreateCommentation(CommentationType commentationType, int bookId, int userId)
     {
@@ -291,6 +290,30 @@ public class BookMutation
             password = user.password,
         };
     }
+    public async Task<UserResult> Update2(int userId, AppSellBook.Schema.Inputs.RegisterInfor registerInfor)
+    {
+
+        User user = new User()
+        {
+            userId = userId,
+            email = registerInfor.email,
+            gender = registerInfor.gender,
+            phone = registerInfor.phone,
+            firstName = registerInfor.firstName,
+            lastName = registerInfor.lastName,
+            dateOfBirth = registerInfor.dateOfBirth,
+            point = 0,
+            purchaseAddress = registerInfor.purchaseAddress,
+            deliveryAddress = registerInfor.deliveryAddress,
+        };
+        user = await _userRepository.UpdateUser2(user);
+        return new UserResult()
+        {
+            userId=userId,
+            username = user.username,
+            password = user.password,
+        };
+    }
     public async Task<UserResult> Login(AppSellBook.Schema.Inputs.LoginRequest loginRequest)
     {
         User userByUsername = await _userRepository.GetUserByName(loginRequest.username);
@@ -356,11 +379,28 @@ public class BookMutation
             username = user.username,
         };
     }
-<<<<<<< HEAD
-    //WishLists
-=======
+    public async Task<bool> ChangePass(int userId,string pass, string passNew) {
+        User userExist= await _userRepository.GetUserById(userId);
+        if(_passwordHashser.VerifyPassword(pass,userExist.password ))
+        {
+            userExist.password = _passwordHashser.HashPasswords(passNew);
+            userExist =await _userRepository.UpdatePass(userExist);
+            return true;
+        }
+        else
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Mật khẩu hiện tại không đúng!",
+                Details = "Lỗi sai lấy mật khẩu hiện tại!"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+
+    }
+
     //WishList
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
     public async Task<WishListResult> AddWishlist(int userId,int bookId)
     {
         WishList wishListExist = await _wishListRepository.GetWishListByUserId(userId);
@@ -408,10 +448,27 @@ public class BookMutation
             wishListName = wishListExist.wishListName
         };
     }
-<<<<<<< HEAD
     //Carts
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+
+    public async Task<bool> UpdateCheckBox(int cartDetailId, bool isSelected)
+    {
+        CartDetail cartDetail = new CartDetail()
+        {
+            cartDetailId = cartDetailId,
+            isSelected = isSelected
+        };
+        try
+        {
+            var result = await _cartDetailRepository.updateCheckBox(cartDetail);
+            return result; // Trả về true nếu cập nhật thành công
+        }
+        catch (Exception ex)
+        {
+            // Log lỗi nếu cần
+            Console.WriteLine($"Error updating checkbox: {ex.Message}");
+            return false; // Trả về false nếu có lỗi
+        }
+    }
     public async Task<CartResult> AddCart(int userId, int bookId)
     {
         User user= await _userRepository.GetUserById(userId);
@@ -465,11 +522,42 @@ public class BookMutation
         };
 
     }
-<<<<<<< HEAD
+    public async Task<bool> DeleteCartDetail(int cartDetailId)
+    {
+        return await _cartDetailRepository.deleteCartDetail(cartDetailId);
+    }
+    public async Task<bool> UpdateQuantity(int cartDetailId, int quantity)
+    {
+        if (quantity <= 0)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Sách đã tồn tại trong danh sách yêu thích",
+                Details = "Sách này đã có trong Wishlist của bạn"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        try
+        {
+            var result = await _cartDetailRepository.updateQuantity(cartDetailId,quantity);
+            return result; 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating checkbox: {ex.Message}");
+            return false; 
+        }
+    }
     //Orders
     public async Task<OrderResult> AddOrder(int userId)
     {
         Cart cartExist= await _cartRepository.GetCartByUserId(userId);
+        var selectedCartDetails = cartExist.cartDetails.Where(cd => cd.isSelected).ToList();
+        if (!selectedCartDetails.Any())
+        {
+            throw new Exception("Không có sản phẩm nào được chọn để đặt hàng.");
+        }
         Order order = new Order()
         {
             orderDate = DateTime.Now,
@@ -480,7 +568,7 @@ public class BookMutation
 
         };
         order=await _orderRepository.CreateOrder(order);
-        foreach(var carDetail in cartExist.cartDetails)
+        foreach(var carDetail in selectedCartDetails)
         {
             OrderDetail orderDetail = new OrderDetail()
             {
@@ -496,6 +584,27 @@ public class BookMutation
             orderId = order.orderId,
         };
     }
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+    public async Task<bool> RemoveOrder(int orderId)
+    {
+        var orderExist=await _orderRepository.GetOrderById(orderId);
+        Order order = new Order()
+        {
+            orderId = orderId,           
+        };
+        DateTime time= DateTime.Now;
+        if (time - orderExist.orderDate > TimeSpan.FromHours(8))
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Đơn hàng đã quá 8 giờ. Bạn không được phép hủy đơn!",
+                Details = "Lỗi khi tìm kiếm tài khoản theo username."
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        else
+        {
+            return await _orderRepository.DeleteOrder(order);
+        }
+    }
 }

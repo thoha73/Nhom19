@@ -91,6 +91,36 @@ namespace AppSellBook.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("AppSellBook.Entities.BookCategory", b =>
+                {
+                    b.Property<int>("booksbookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("categoriescategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("booksbookId", "categoriescategoryId");
+
+                    b.HasIndex("categoriescategoryId");
+
+                    b.ToTable("BookCategory");
+                });
+
+            modelBuilder.Entity("AppSellBook.Entities.BookWishList", b =>
+                {
+                    b.Property<int>("booksbookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("wishListswishListId")
+                        .HasColumnType("int");
+
+                    b.HasKey("booksbookId", "wishListswishListId");
+
+                    b.HasIndex("wishListswishListId");
+
+                    b.ToTable("BookWishList");
+                });
+
             modelBuilder.Entity("AppSellBook.Entities.Cart", b =>
                 {
                     b.Property<int>("cartId")
@@ -133,6 +163,9 @@ namespace AppSellBook.Migrations
 
                     b.Property<int>("cartId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("isSelected")
+                        .HasColumnType("bit");
 
                     b.Property<int>("quantity")
                         .HasColumnType("int");
@@ -223,6 +256,34 @@ namespace AppSellBook.Migrations
                     b.HasIndex("bookId");
 
                     b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("AppSellBook.Entities.Notification", b =>
+                {
+                    b.Property<int>("notificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("notificationId"));
+
+                    b.Property<string>("context")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("isRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("userId")
+                        .HasColumnType("int");
+
+                    b.HasKey("notificationId");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("AppSellBook.Entities.Order", b =>
@@ -395,36 +456,6 @@ namespace AppSellBook.Migrations
                     b.ToTable("WishLists");
                 });
 
-            modelBuilder.Entity("BookCategory", b =>
-                {
-                    b.Property<int>("booksbookId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("categoriescategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("booksbookId", "categoriescategoryId");
-
-                    b.HasIndex("categoriescategoryId");
-
-                    b.ToTable("BookCategory", (string)null);
-                });
-
-            modelBuilder.Entity("BookWishList", b =>
-                {
-                    b.Property<int>("booksbookId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("wishListswishListId")
-                        .HasColumnType("int");
-
-                    b.HasKey("booksbookId", "wishListswishListId");
-
-                    b.HasIndex("wishListswishListId");
-
-                    b.ToTable("BookWishList", (string)null);
-                });
-
             modelBuilder.Entity("AppSellBook.Entities.Book", b =>
                 {
                     b.HasOne("AppSellBook.Entities.Author", "author")
@@ -434,6 +465,44 @@ namespace AppSellBook.Migrations
                         .IsRequired();
 
                     b.Navigation("author");
+                });
+
+            modelBuilder.Entity("AppSellBook.Entities.BookCategory", b =>
+                {
+                    b.HasOne("AppSellBook.Entities.Book", "book")
+                        .WithMany("bookCategories")
+                        .HasForeignKey("booksbookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AppSellBook.Entities.Category", "category")
+                        .WithMany("bookCategories")
+                        .HasForeignKey("categoriescategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("book");
+
+                    b.Navigation("category");
+                });
+
+            modelBuilder.Entity("AppSellBook.Entities.BookWishList", b =>
+                {
+                    b.HasOne("AppSellBook.Entities.Book", "book")
+                        .WithMany("bookWishLists")
+                        .HasForeignKey("booksbookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AppSellBook.Entities.WishList", "wishList")
+                        .WithMany("bookWishLists")
+                        .HasForeignKey("wishListswishListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("book");
+
+                    b.Navigation("wishList");
                 });
 
             modelBuilder.Entity("AppSellBook.Entities.Cart", b =>
@@ -496,6 +565,16 @@ namespace AppSellBook.Migrations
                     b.Navigation("book");
                 });
 
+            modelBuilder.Entity("AppSellBook.Entities.Notification", b =>
+                {
+                    b.HasOne("AppSellBook.Entities.User", "user")
+                        .WithMany("notifications")
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("user");
+                });
+
             modelBuilder.Entity("AppSellBook.Entities.Order", b =>
                 {
                     b.HasOne("AppSellBook.Entities.User", "user")
@@ -556,36 +635,6 @@ namespace AppSellBook.Migrations
                     b.Navigation("user");
                 });
 
-            modelBuilder.Entity("BookCategory", b =>
-                {
-                    b.HasOne("AppSellBook.Entities.Book", null)
-                        .WithMany()
-                        .HasForeignKey("booksbookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AppSellBook.Entities.Category", null)
-                        .WithMany()
-                        .HasForeignKey("categoriescategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BookWishList", b =>
-                {
-                    b.HasOne("AppSellBook.Entities.Book", null)
-                        .WithMany()
-                        .HasForeignKey("booksbookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AppSellBook.Entities.WishList", null)
-                        .WithMany()
-                        .HasForeignKey("wishListswishListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AppSellBook.Entities.Author", b =>
                 {
                     b.Navigation("books");
@@ -593,6 +642,10 @@ namespace AppSellBook.Migrations
 
             modelBuilder.Entity("AppSellBook.Entities.Book", b =>
                 {
+                    b.Navigation("bookCategories");
+
+                    b.Navigation("bookWishLists");
+
                     b.Navigation("cartDetails");
 
                     b.Navigation("commentations");
@@ -605,6 +658,11 @@ namespace AppSellBook.Migrations
             modelBuilder.Entity("AppSellBook.Entities.Cart", b =>
                 {
                     b.Navigation("cartDetails");
+                });
+
+            modelBuilder.Entity("AppSellBook.Entities.Category", b =>
+                {
+                    b.Navigation("bookCategories");
                 });
 
             modelBuilder.Entity("AppSellBook.Entities.Order", b =>
@@ -623,11 +681,18 @@ namespace AppSellBook.Migrations
 
                     b.Navigation("commentations");
 
+                    b.Navigation("notifications");
+
                     b.Navigation("orders");
 
                     b.Navigation("roleUsers");
 
                     b.Navigation("wishLists");
+                });
+
+            modelBuilder.Entity("AppSellBook.Entities.WishList", b =>
+                {
+                    b.Navigation("bookWishLists");
                 });
 #pragma warning restore 612, 618
         }

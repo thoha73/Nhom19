@@ -62,7 +62,9 @@ namespace AppSellBook.Services.Books
             {
                 return await context.Books.Include(c => c.images)
                                           .Include(a=>a.author)
-                                          .Include(c => c.categories).ToListAsync();
+                                          .Include(c => c.bookCategories)
+                                          .ThenInclude(bc => bc.category)
+                                          .ToListAsync();
             }
         }
 
@@ -72,7 +74,8 @@ namespace AppSellBook.Services.Books
             {
                 return await context.Books.Include(c => c.images)
                                             .Include(a=>a.author)
-                                            .Include(c=>c.categories)
+                                          .Include(c => c.bookCategories)
+                                          .ThenInclude(bc => bc.category)
                                            .FirstOrDefaultAsync(r => r.bookId == bookId);
             }
         }
@@ -89,7 +92,12 @@ namespace AppSellBook.Services.Books
         {
             using(BookDBContext context = _contextFactory.CreateDbContext())
             {
-                return await context.Books.Include(c => c.images).Include(c=>c.categories).Where(c=>c.categories.Any(b=>b.categoryId==categoryId)).ToListAsync();
+                return await context.Books
+                            .Include(b => b.images)                      
+                            .Include(b => b.bookCategories)               
+                            .Where(b => b.bookCategories
+                                .Any(bc => bc.categoriescategoryId == categoryId)) 
+                            .ToListAsync();
             }
         }
 

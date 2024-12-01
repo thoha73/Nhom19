@@ -21,5 +21,24 @@ namespace AppSellBook.Services.Orders
             }
             
         }
+
+
+        public async Task<bool> DeleteOrder(Order order)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                context.Orders.Remove(order);
+                return await context.SaveChangesAsync()>0;
+            }
+        }
+
+        public async Task<Entities.Order> GetOrderById(int orderId)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                
+                return await context.Orders.FirstOrDefaultAsync(r=>r.orderId==orderId);
+            }
+        }
     }
 }

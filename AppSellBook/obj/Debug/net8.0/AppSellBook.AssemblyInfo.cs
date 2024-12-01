@@ -14,11 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AppSellBook")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38fd583bd06643b51a1d3a10c7ca9b6123963300")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+03205ae78dea7dcb16e1d5f35df6ce9b4cb80d6f")]
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45b3a0aae1a336f7325a2cff52c7526d55f15040")]
 [assembly: System.Reflection.AssemblyProductAttribute("AppSellBook")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AppSellBook")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

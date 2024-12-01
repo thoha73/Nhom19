@@ -40,7 +40,8 @@ namespace AppSellBook.Services.Categories
         {
             using(BookDBContext context=_dbContextFactory.CreateDbContext())
             {
-                return await context.Categories.Include(b=>b.books).ToListAsync();
+                return await context.Categories.Include(b=>b.bookCategories).ThenInclude(c => c.book)
+                                            .ToListAsync();
             }
         }
 

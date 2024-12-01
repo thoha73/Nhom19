@@ -7,6 +7,7 @@ using AppSellBook.Services.CartDetails;
 using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Services.Images;
+using AppSellBook.Services.Notifications;
 using AppSellBook.Services.OrderDetails;
 using AppSellBook.Services.Orders;
 using AppSellBook.Services.PasswordHashers;
@@ -56,12 +57,12 @@ builder.Services.AddSingleton<IPasswordHashser, BcryptPasswordHasher>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleUserRepository, RoleUserRepository>();
 builder.Services.AddScoped<IWishListRepository, WishListRepository>();
-<<<<<<< HEAD
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
 builder.Services.AddScoped<IBookWishListRepository, BookWishListRepository>();
+builder.Services.AddScoped<IBookCategoryRepository, BookCategoryRepository>();
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<BookQuery>(); 
 builder.Services.AddScoped<CategoryQuery>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -17,6 +17,7 @@ namespace AppSellBook.Entities
         public string? purchaseAddress { get; set; }
         public string? deliveryAddress { get; set; }
         public IEnumerable<RoleUser> roleUsers { get; set; }
+        public IEnumerable<Notification> notifications { get; set; }
         public IEnumerable<Cart> carts { get; set; }
         public IEnumerable<Order> orders { get; set; }
         public IEnumerable<WishList> wishLists { get; set; }

@@ -13,7 +13,7 @@
         public int authorId { get; set; }
         public Author author { get; set; }
         public double rank { get; set; }
-        public IEnumerable<Category> categories { get; set; }
+        public IEnumerable<BookCategory> bookCategories { get; set; }
         public IEnumerable<Image> images { get; set; }
         public IEnumerable<CartDetail> cartDetails { get; set; }
         public IEnumerable<OrderDetail> orderDetails { get; set; }

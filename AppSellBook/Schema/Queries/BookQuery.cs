@@ -8,10 +8,8 @@ using AppSellBook.Schema.Results;
 using AppSellBook.Services.CartDetails;
 using AppSellBook.Services.WishLists;
 using AppSellBook.Services.Users;
-<<<<<<< HEAD
 using AppSellBook.Services.OrderDetails;
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+using AppSellBook.Services;
 
 namespace AppSellBook.Schema.Queries
 {
@@ -23,23 +21,19 @@ namespace AppSellBook.Schema.Queries
         private readonly ICartDetailRepository _cartDetailRepository;
         private readonly IWishListRepository _wishListRepository;
         private readonly IUserRepository _userRepository;
-<<<<<<< HEAD
         private readonly IOrderDetailRepository _orderDetailRepository;
-        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository, ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository,IOrderDetailRepository orderDetailRepository)
-=======
-        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository, ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository)
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
-        {
+        private readonly IAuthorRepository _authorRepository;
+        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository,
+                        ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository,IOrderDetailRepository orderDetailRepository,IAuthorRepository authorRepository)
+        { 
             _bookRepository = bookRepository;
             _categoryRepository = categoryRepository;
             _commentationRepository = commentationRepository;
             _cartDetailRepository = cartDetailRepository;
             _wishListRepository = wishListRepository;
             _userRepository = userRepository;
-<<<<<<< HEAD
             _orderDetailRepository = orderDetailRepository;
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+            _authorRepository = authorRepository;
         }
         //Books
         [UseSorting]
@@ -73,10 +67,10 @@ namespace AppSellBook.Schema.Queries
                     imageData = Convert.ToBase64String(i.imageData),
                     icon = i.icon,
                 }).ToList(),
-                categories = b.categories.Select(c => new CategoryType()
+                categories = b.bookCategories.Select(c => new CategoryType()
                 {
-                    categoryId = c.categoryId,
-                    categoryName = c.categoryName,
+                    categoryId = c.category.categoryId,
+                    categoryName = c.category.categoryName,
                 })
 
 
@@ -112,10 +106,10 @@ namespace AppSellBook.Schema.Queries
                     imageData = Convert.ToBase64String(i.imageData),
                     icon = i.icon,
                 }).ToList(),
-                categories = b.categories.Select(c => new CategoryType()
+                categories = b.bookCategories.Select(c => new CategoryType()
                 {
-                    categoryId = c.categoryId,
-                    categoryName = c.categoryName,
+                    categoryId = c.category.categoryId,
+                    categoryName = c.category.categoryName,
                 })
 
 
@@ -151,10 +145,10 @@ namespace AppSellBook.Schema.Queries
                     imageData = Convert.ToBase64String(i.imageData),
                     icon = i.icon,
                 }).ToList(),
-                categories = bookDTO.categories.Select(c => new CategoryType()
+                categories = bookDTO.bookCategories.Select(c => new CategoryType()
                 {
-                    categoryId = c.categoryId,
-                    categoryName = c.categoryName,
+                    categoryId = c.category.categoryId,
+                    categoryName = c.category.categoryName,
                 })
 
             };
@@ -162,6 +156,16 @@ namespace AppSellBook.Schema.Queries
         public async Task<int> GetBookCount()
         {
             return await _bookRepository.GetBookCount();
+        }
+        //Author
+        public async Task<IEnumerable<AuthorResult>> GetAuthors()
+        {
+            IEnumerable<Author> authors = await _authorRepository.GetAuthor();
+            return authors.Select(a => new AuthorResult()
+            {
+                authorId = a.authorId,
+                authorName = a.authorName
+            });
         }
         //Categories
         public async Task<IEnumerable<CategoryType>> GetCategories()
@@ -171,6 +175,7 @@ namespace AppSellBook.Schema.Queries
             {
                 categoryId = c.categoryId,
                 categoryName = c.categoryName,
+                
 
             });
         }
@@ -202,6 +207,7 @@ namespace AppSellBook.Schema.Queries
                 cartDetailId = b.cartDetailId,
                 quantity = b.quantity,
                 sellPrice = b.sellPrice,
+                isSelected = b.isSelected,
                 book = new BookResult()
                 {
                     bookId = b.bookId,
@@ -216,29 +222,33 @@ namespace AppSellBook.Schema.Queries
                 }
             }).ToList() ;
         }
-<<<<<<< HEAD
-        public async Task<IEnumerable<BookResult>> GetBookNotComment(int userId)
+        public async Task<IEnumerable<OrderDetailResult>> GetBookNotComment(int userId)
         {
-            IEnumerable<Book> books=await _orderDetailRepository.GetBookNotCommentByUser(userId);
-            return books.Select(b => new BookResult()
+            IEnumerable<OrderDetail> orderDetails = await _orderDetailRepository.GetBookNotCommentByUser(userId);
+            return orderDetails.Select(b => new OrderDetailResult()
             {
-                bookId = b.bookId,
-                bookName = b.bookName,
-                images = b.images
-                .Where(i => i.icon == true)
-                .Select(i => new ImageResult()
+                orderDetailId = b.orderDetailId,
+                quantity = b.quantity,
+                sellPrice = b.sellPrice,
+                book = new BookResult()  
                 {
-                    imageName = i.imageName,
-                    imageData = Convert.ToBase64String(i.imageData),
-                }).ToList(),
+                    bookId = b.book.bookId,
+                    bookName = b.book.bookName,
+                    images = b.book.images
+                    .Where(i => i.icon == true)
+                    .Select(i => new ImageResult()
+                    {
+                        imageName = i.imageName,
+                        imageData = Convert.ToBase64String(i.imageData)
+                    }).ToList()
+                },
+ 
             }).ToList();
         }
         public async Task<int> GetBookCountInCart(int userId)
         {
             return await _cartDetailRepository.GetBookCountInCart(userId);
         }
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
         //WishLists
         public async Task<IEnumerable<BookResult>> GetWishListForUser(int userId)
         {
@@ -283,11 +293,13 @@ namespace AppSellBook.Schema.Queries
             {
                 firstName = userDTO.firstName,
                 lastName = userDTO.lastName,
+                password = userDTO.password,
                 email = userDTO.email,
                 gender = userDTO.gender,
                 phone = userDTO.phone,
                 purchaseAddress = userDTO.purchaseAddress,
                 deliveryAddress = userDTO.deliveryAddress,
+                dateOfBirth=userDTO.dateOfBirth,
                 point = userDTO.point,
             };
         }

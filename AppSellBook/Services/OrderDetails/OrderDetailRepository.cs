@@ -21,29 +21,49 @@ namespace AppSellBook.Services.OrderDetails
             }
         }
 
-        public  async Task<IEnumerable<Book>> GetBookNotCommentByUser(int userId)
+        public async Task<IEnumerable<OrderDetail>> GetBookNotCommentByUser(int userId)
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
             {
-                var dateExpired= DateTime.Now.AddDays(-25);
-                var unreviewedBooks = await context.OrderDetails
-                    .Where(cd => cd.order.userId == userId &&cd.order.orderStatus.Equals("Processing") && cd.order.orderDate>=dateExpired)
-                    .Select(cd => cd.bookId) 
-                    .Except(context.Commentations
-                                .Where(c => c.userId == userId) 
-                                .Select(c => c.bookId)) 
-                    .Join(context.Books, bookId => bookId, book => book.bookId, (bookId, book) => book)
+                var dateExpired = DateTime.Now.AddDays(-5);
+                var orderDetails = await context.OrderDetails
+                    .Where(cd => cd.order.userId == userId
+                                 && cd.order.orderStatus.Equals("Processing")
+                                 && cd.order.orderDate >= dateExpired)
                     .ToListAsync();
-                foreach (var book in unreviewedBooks)
+
+                var reviewedBookIds = await context.Commentations
+                    .Where(c => c.userId == userId)
+                    .Select(c => c.bookId)
+                    .ToListAsync();
+
+                // Lọc ra những OrderDetail chưa có sách nào đã được đánh giá
+                var unreviewedOrderDetails = orderDetails
+                    .Where(cd => !reviewedBookIds.Contains(cd.bookId))
+                    .ToList();
+
+                // Lấy thông tin sách tương ứng với OrderDetail chưa có comment
+                foreach (var orderDetail in unreviewedOrderDetails)
                 {
-                    var images = await context.Images
-                        .Where(i => i.bookId == book.bookId && i.icon == true)
-                        .ToListAsync();
-                    book.images = images;
+                    var book = await context.Books
+                        .Where(b => b.bookId == orderDetail.bookId)
+                        .FirstOrDefaultAsync();
+
+                    if (book != null)
+                    {
+                        // Lấy các hình ảnh có icon cho sách
+                        var images = await context.Images
+                            .Where(i => i.bookId == book.bookId && i.icon)
+                            .ToListAsync();
+
+                        book.images = images;
+                        orderDetail.book = book; // Gắn thông tin sách vào OrderDetail
+                    }
                 }
 
-                return unreviewedBooks;
+                return unreviewedOrderDetails;
             }
         }
+
     }
 }

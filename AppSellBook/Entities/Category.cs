@@ -4,7 +4,7 @@
     {
         public int categoryId { get; set; }
         public string categoryName { get; set; }
-        public IEnumerable<Book> books { get; set; }
+        public IEnumerable<BookCategory> bookCategories { get; set; }
 
     }
 }

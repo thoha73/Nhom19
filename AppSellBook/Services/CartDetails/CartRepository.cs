@@ -25,11 +25,9 @@ namespace AppSellBook.Services.CartDetails
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
             {
-<<<<<<< HEAD
                 return await context.Carts.Include(r=>r.cartDetails).ThenInclude(b=>b.book).FirstOrDefaultAsync(c => c.userId == userId);
-=======
-                return await context.Carts.FirstOrDefaultAsync(c => c.userId == userId);
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
+
+
             }
         }
     }

@@ -20,6 +20,8 @@ namespace AppSellBook.Services
         public DbSet<WishList> WishLists { get; set; }
         public DbSet<RoleUser> RoleUser { get; set; }
         public DbSet<BookWishList> BookWishList { get; set; }
+        public DbSet<BookCategory> BookCategory { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,14 +40,7 @@ namespace AppSellBook.Services
                 .Property(i => i.bookId)
                 .IsRequired();
 
-            modelBuilder.Entity<Category>()
-                .HasMany(c => c.books)
-                .WithMany(b => b.categories);
-
-            modelBuilder.Entity<Book>()
-                .HasMany(b => b.categories)
-                .WithMany(c => c.books)
-                .UsingEntity(j => j.ToTable("BookCategory"));   
+ 
             modelBuilder.Entity<Book>()
                 .HasMany(i=>i.images)
                 .WithOne(f => f.book)
@@ -148,6 +143,15 @@ namespace AppSellBook.Services
             //    .HasMany(w => w.wishLists)
             //    .WithMany(b => b.books)
             //    .UsingEntity(j => j.ToTable("BookWishList"));
+
+    //        modelBuilder.Entity<Category>()
+    //.HasMany(c => c.books)
+    //.WithMany(b => b.categories);
+
+    //        modelBuilder.Entity<Book>()
+    //            .HasMany(b => b.categories)
+    //            .WithMany(c => c.books)
+    //            .UsingEntity(j => j.ToTable("BookCategory"));
             modelBuilder.Entity<BookWishList>()
                 .HasKey(bw => new { bw.booksbookId, bw.wishListswishListId });
             modelBuilder.Entity<BookWishList>()
@@ -158,6 +162,23 @@ namespace AppSellBook.Services
                 .HasOne(bw => bw.wishList)
                 .WithMany(b => b.bookWishLists)
                 .HasForeignKey(bw => bw.wishListswishListId);
+
+            modelBuilder.Entity<BookCategory>()
+                .HasKey(bc => new { bc.booksbookId, bc.categoriescategoryId });
+            modelBuilder.Entity<BookCategory>()
+                .HasOne(bc => bc.book)
+                .WithMany(b => b.bookCategories)
+                .HasForeignKey(bw => bw.booksbookId);
+            modelBuilder.Entity<BookCategory>()
+                .HasOne(bw => bw.category)
+                .WithMany(b => b.bookCategories)
+                .HasForeignKey(bw => bw.categoriescategoryId);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n=>n.user)
+                .WithMany(u=>u.notifications)
+                .HasForeignKey(n=>n.userId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

@@ -21,6 +21,20 @@ namespace AppSellBook.Services.CartDetails
             }
         }
 
+        public async Task<bool> deleteCartDetail(int cartDetailId)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                CartDetail cartDetail = new CartDetail()
+                {
+                    cartDetailId = cartDetailId
+                };
+                context.CartDetails.Remove(cartDetail);
+                
+                return await context.SaveChangesAsync()>0;
+            }
+        }
+
         public async Task<bool> existsInCart(int cartId, int bookId)
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
@@ -29,8 +43,6 @@ namespace AppSellBook.Services.CartDetails
                 return await context.CartDetails.AnyAsync(r => r.cartId == cartId && r.bookId == bookId);
             }
         }
-
-<<<<<<< HEAD
         public async Task<int> GetBookCountInCart(int userId)
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
@@ -40,8 +52,6 @@ namespace AppSellBook.Services.CartDetails
             }
         }
 
-=======
->>>>>>> 38fd583bd06643b51a1d3a10c7ca9b6123963300
         public async Task<IEnumerable<CartDetail>> GetBooksInCart(int userId)
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
@@ -50,6 +60,58 @@ namespace AppSellBook.Services.CartDetails
                                                 .ThenInclude(i=>i.images)
                                                 .Where(c=>c.cart.userId==userId)
                                                 .AsNoTracking().ToListAsync();
+            }
+        }
+
+        public async Task<bool> updateCheckBox(CartDetail cartDetail)
+        {
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                try
+                {
+                    var existingCartDetail = await context.CartDetails
+                                                         .FirstOrDefaultAsync(cd => cd.cartDetailId == cartDetail.cartDetailId);
+                    if (existingCartDetail == null)
+                    {
+                        Console.WriteLine("CartDetail not found");
+                        return false;
+                    }
+                    existingCartDetail.isSelected = cartDetail.isSelected;
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating checkbox: {ex.Message}");
+                    return false;
+                }
+            }
+        }
+
+        public async Task<bool> updateQuantity(int cartDetailId, int quantity)
+        {
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                try
+                {
+                    var existingCartDetail = await context.CartDetails
+                                                         .FirstOrDefaultAsync(cd => cd.cartDetailId == cartDetailId);
+                    if (existingCartDetail == null)
+                    {
+                        Console.WriteLine("CartDetail not found");
+                        return false;
+                    }
+
+
+                    existingCartDetail.quantity = quantity;
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating checkbox: {ex.Message}");
+                    return false;
+                }
             }
         }
     }
