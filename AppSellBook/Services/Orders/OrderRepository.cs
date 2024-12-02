@@ -11,6 +11,16 @@ namespace AppSellBook.Services.Orders
             _contextFactory = contextFactory;
         }
 
+        public async Task<bool> ConfirmOrder(Order order)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                context.Orders.Update(order);
+                
+                return await context.SaveChangesAsync()>0;
+            }
+        }
+
         public async Task<Order> CreateOrder(Order order)
         {
             using(BookDBContext context=_contextFactory.CreateDbContext())
@@ -37,7 +47,20 @@ namespace AppSellBook.Services.Orders
             using (BookDBContext context = _contextFactory.CreateDbContext())
             {
                 
-                return await context.Orders.FirstOrDefaultAsync(r=>r.orderId==orderId);
+                return await context.Orders.Include(u => u.user).Include(o => o.orderDetails)
+                                            .ThenInclude(b => b.book).FirstOrDefaultAsync(r=>r.orderId==orderId);
+            }
+        }
+
+        public async Task<IEnumerable<Order>> GetOrdersByProcesing()
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+
+                var orders= await context.Orders.Include(u=>u.user).Include(o=>o.orderDetails)
+                                            .ThenInclude(b=>b.book)
+                                            .Where(r=>r.orderStatus.Equals("Processing")).ToListAsync();
+                return orders;
             }
         }
     }

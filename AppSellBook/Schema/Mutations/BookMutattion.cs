@@ -8,6 +8,7 @@ using AppSellBook.Services.CartDetails;
 using AppSellBook.Services.Categories;
 using AppSellBook.Services.Commentations;
 using AppSellBook.Services.Images;
+using AppSellBook.Services.Notifications;
 using AppSellBook.Services.OrderDetails;
 using AppSellBook.Services.Orders;
 using AppSellBook.Services.PasswordHashers;
@@ -35,12 +36,13 @@ public class BookMutation
     private readonly IOrderRepository _orderRepository;
     private readonly IOrderDetailRepository _orderDetailRepository;
     private readonly IBookCategoryRepository _bookCategoryRepository;
+    private readonly INotificationRepository _notificationRepository;
     public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,
                         ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,
                         IUserRepository userRepository ,IPasswordHashser passwordHashser,IRoleRepository roleRepository,
                         IRoleUserRepository roleUserRepository, IWishListRepository wishListRepository, IBookWishListRepository bookWishListRepository,
                         ICartRepository cartRepository,ICartDetailRepository cartDetailRepository,IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository,
-                        IBookCategoryRepository bookCategoryRepository)
+                        IBookCategoryRepository bookCategoryRepository, INotificationRepository notificationRepository)
     {
         _bookRepository = bookRepository;
         _imageRepository = imageRepository;
@@ -57,6 +59,7 @@ public class BookMutation
         _orderRepository = orderRepository;
         _orderDetailRepository= orderDetailRepository;
         _bookCategoryRepository = bookCategoryRepository;
+        _notificationRepository = notificationRepository;
 
     }
     //Book
@@ -607,4 +610,59 @@ public class BookMutation
             return await _orderRepository.DeleteOrder(order);
         }
     }
+    public async Task<bool> RemoveOrder1(int orderId)
+    {
+        var orderExist = await _orderRepository.GetOrderById(orderId);
+        Order order = new Order()
+        {
+            orderId = orderId,
+        };
+        return await _orderRepository.DeleteOrder(order);
+
+    }
+    public async Task<bool> UpdateOrder(int orderId)
+    {
+        Order order= await _orderRepository.GetOrderById(orderId);
+        if (order != null)
+        {
+            order.deliveryDate = DateTime.Now;
+            order.orderStatus = "Success";
+        }
+        var orderResult= await _orderRepository.ConfirmOrder(order);
+        return orderResult;
+    }
+    //Notification
+    public async Task<bool> CreateNotification(NotificationType notification)
+    {
+        Notification notificationNew = new Notification()
+        {
+            context = notification.context,
+            createdAt = DateTime.Now,
+            isRead = false,
+            userId = notification.userId,
+        };
+        var notificationResult= await _notificationRepository.CreateNotification(notificationNew);
+        if(notificationResult != null)
+        {
+            return true;
+        }
+        return false;
+    }
+    public async Task<bool> CreateNotificationForShop(NotificationType notification)
+    {
+        Notification notificationNew = new Notification()
+        {
+            context = notification.context,
+            createdAt = DateTime.Now,
+            isRead = false,
+            userId = 42,
+        };
+        var notificationResult = await _notificationRepository.CreateNotification(notificationNew);
+        if (notificationResult != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -10,6 +10,8 @@ using AppSellBook.Services.WishLists;
 using AppSellBook.Services.Users;
 using AppSellBook.Services.OrderDetails;
 using AppSellBook.Services;
+using AppSellBook.Services.Orders;
+using AppSellBook.Services.Notifications;
 
 namespace AppSellBook.Schema.Queries
 {
@@ -23,7 +25,9 @@ namespace AppSellBook.Schema.Queries
         private readonly IUserRepository _userRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IAuthorRepository _authorRepository;
-        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository,
+        private readonly IOrderRepository _orderRepository;
+        private readonly INotificationRepository _notificationRepository;
+        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository,IOrderRepository orderRepository,INotificationRepository notificationRepository,
                         ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository,IOrderDetailRepository orderDetailRepository,IAuthorRepository authorRepository)
         { 
             _bookRepository = bookRepository;
@@ -34,6 +38,8 @@ namespace AppSellBook.Schema.Queries
             _userRepository = userRepository;
             _orderDetailRepository = orderDetailRepository;
             _authorRepository = authorRepository;
+            _orderRepository= orderRepository;
+            _notificationRepository= notificationRepository;
         }
         //Books
         [UseSorting]
@@ -303,5 +309,106 @@ namespace AppSellBook.Schema.Queries
                 point = userDTO.point,
             };
         }
+        //Order
+
+        public async Task<IEnumerable<OrderResult>> GetOrderConfirm()
+        {
+            // Lấy danh sách orders từ repository
+            IEnumerable<Order> orders = await _orderRepository.GetOrdersByProcesing();
+
+            // Nếu orders là null hoặc rỗng, trả về danh sách rỗng
+            if (orders == null || !orders.Any())
+            {
+                return new List<OrderResult>();
+            }
+
+            // Duyệt qua từng order và tạo OrderResult
+            return orders.Select(o => new OrderResult()
+            {
+                user= new UserResult()
+                {
+                    userId=o.userId,
+                    firstName=o.user.firstName
+                },
+                orderId = o.orderId,
+                deliveryAddress = o.deliveryAddress,
+                paymentMethod = o.paymentMethod,
+                orderDetails = o.orderDetails?.Select(d =>
+                {
+                    // Nếu d.book là null, trả về null
+                    if (d.book == null)
+                        return null;
+
+                    // Tạo OrderDetailResult
+                    return new OrderDetailResult()
+                    {
+                        sellPrice = d.sellPrice,
+                        quantity = d.quantity,
+                        book = new BookResult()
+                        {
+                            bookName = d.book.bookName
+                        }
+                    };
+                })
+                .Where(d => d != null) // Loại bỏ phần tử null
+                .ToList() ?? new List<OrderDetailResult>() // Trả về danh sách rỗng nếu không có phần tử
+            });
+        }
+        public async Task<OrderResult> GetOrderById(int orderId)
+        {
+            Order order= await _orderRepository.GetOrderById(orderId);
+            return new OrderResult()
+            {
+                user = new UserResult()
+                {
+                    firstName = order.user.firstName
+                },
+                deliveryAddress = order.deliveryAddress,
+                paymentMethod= order.paymentMethod,
+                orderDetails = order.orderDetails?.Select(d =>
+                {
+                    if (d.book == null)
+                        return null;
+                    return new OrderDetailResult()
+                    {
+                        sellPrice = d.sellPrice,
+                        quantity = d.quantity,
+                        book = new BookResult()
+                        {
+                            bookName = d.book.bookName
+                        }
+                    };
+                })
+                .Where(d => d != null) 
+                .ToList() ?? new List<OrderDetailResult>()
+            };
+        }
+        //Notification
+        public async Task<IEnumerable<NotificationResult>> GetAllNotification(int userId)
+        {
+            IEnumerable<Notification> notifications= await _notificationRepository.GetAllNotificationsForUser(userId);
+            return notifications.Select(r => new NotificationResult()
+            {
+                context = r.context,
+                createdAt = r.createdAt,
+                isRead = r.isRead,
+
+            });
+        }
+        public async Task<IEnumerable<NotificationResult>> GetAllNotificationForShop(int userId)
+        {
+            IEnumerable<Notification> notifications = await _notificationRepository.GetAllNotificationsForShop(userId);
+            return notifications.Select(r => new NotificationResult()
+            {
+                context = r.context,
+                createdAt = r.createdAt,
+                isRead = r.isRead,
+                user=new UserResult()
+                {
+                    firstName=r.user.firstName
+                }
+            });
+        }
+
     }
 }
