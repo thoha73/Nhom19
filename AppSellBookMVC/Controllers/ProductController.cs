@@ -23,14 +23,35 @@ namespace AppSellBookMVC.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult createProduct()
+        public async Task<IActionResult> createProduct()
         {
+            GetAuthor();
+            var query = new
+            {
+                query = @"
+                    query {
+                        categories {
+                            categoryId
+                            categoryName
+                        }
+                    }"
+            };
+            var content = new StringContent(JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+                var jsonResponse = JsonConvert.DeserializeObject<GraphQLResponse>(responseString);
+                List<Category> list = jsonResponse?.data?.categories ?? new List<Category>();
+                ViewBag.Categories = list;
+                return View(list);
+            }
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> createProduct(string tensach, string tacgia, string isbn, string nhaxuatban, double giaban, string mota, IFormFile avatar, IFormFile anh1, IFormFile anh2, IFormFile anh3)
+        public async Task<IActionResult> createProduct(string tensach, string isbn, string nhaxuatban, double giaban, string mota,int categories,int author, IFormFile avatar, IFormFile anh1, IFormFile anh2, IFormFile anh3)
         {
             if (avatar != null && avatar.Length > 0)
             {
@@ -95,7 +116,7 @@ namespace AppSellBookMVC.Controllers
                                     bookId: 1
                                 }}
                             ]
-                        }},authorId:1) {{
+                        }},authorId:{author},categoryIds:{categories}) {{
                             bookId
                         }}
                     }}"
@@ -143,9 +164,13 @@ namespace AppSellBookMVC.Controllers
                         description
                         isbn
                         listedPrice
+                        publisher
                         sellPrice
                         quantity
-                        author
+                        author{{
+                            authorId
+                            authorName
+                        }}
                         rank
                         images {{
                             imageId
@@ -176,6 +201,10 @@ namespace AppSellBookMVC.Controllers
                         ViewBag.categories = await GetCategories();
                         var selectedCategories = bookData.categories.Select(c => c.categoryId).ToList();
                         ViewBag.selectedCategories = selectedCategories;
+
+                        ViewBag.authors = await GetAuthor();
+                        var selectedAuthor= bookData.author.authorId;
+                        ViewBag.selectedAuthor = selectedAuthor;
                         return View(bookData);
                     }
                     else
@@ -220,17 +249,41 @@ namespace AppSellBookMVC.Controllers
             {
                 var responseString = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonConvert.DeserializeObject<GraphQLResponse>(responseString);
-                //List<Category> list = jsonResponse?.data?.categories ?? new List<Category>();
-                //ViewBag.Categories = list;
-                //return list;
+                List<Category> list = jsonResponse?.data?.categories ?? new List<Category>();
+                ViewBag.Categories = list;
+                return list;
             }
             return new List<Category>();
 
         }
+        public async Task<List<Author>> GetAuthor()
+        {
+            var query = new
+            {
+                query = @"
+                    query{
+                      authors{
+                        authorId
+                        authorName
+                      }
+                    }"
+                                };
+            var content = new StringContent(JsonConvert.SerializeObject(query), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseString = await response.Content.ReadAsStringAsync();
+                var jsonResponse = JsonConvert.DeserializeObject<GraphQLResponse>(responseString);
+                List<Author> list1 = jsonResponse?.data?.authors ?? new List<Author>();
+                ViewBag.Authors = list1;
+                return list1;
+            }
+            return new List<Author>();
 
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> updateProduct(int id, int idanhavatar, int idanh1,int idanh2, int idanh3,string tensach, string tacgia, string isbn, string nhaxuatban, double giaban, string mota, IFormFile avatar, IFormFile anh1, IFormFile anh2, IFormFile anh3)
+        public async Task<IActionResult> updateProduct(int id, int idanhavatar, int idanh1,int idanh2, int idanh3,string tensach, int tacgia, string isbn, string nhaxuatban, double giaban, string mota,int theloai, IFormFile avatar, IFormFile anh1, IFormFile anh2, IFormFile anh3)
         {
             if (avatar != null && avatar.Length > 0)
             {
@@ -261,9 +314,9 @@ namespace AppSellBookMVC.Controllers
                             isbn: ""{isbn}"",
                             listedPrice:0 ,
                             sellPrice: {giaban},
+                            publisher:""{nhaxuatban}"",
                             quantity: 100,
                             description: ""{mota}"",
-                            author: ""{tacgia}"",
                             rank: 5,
                             images: [
                                 {{
@@ -295,7 +348,7 @@ namespace AppSellBookMVC.Controllers
                                     bookId: 1
                                 }}
                             ]
-                        }}) {{
+                        }},authorId:{tacgia},categoryIds:{theloai}) {{
                             bookId
                         }}
                     }}"
@@ -316,7 +369,7 @@ namespace AppSellBookMVC.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Có lỗi xảy ra khi tạo sách.");
+                        ModelState.AddModelError("", "Có lỗi xảy ra khi cập nhật sách.");
                         return View();
                     }
                 }

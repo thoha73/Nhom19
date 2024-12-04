@@ -112,6 +112,7 @@ public class BookMutation
             listedPrice = book.listedPrice,
             sellPrice = book.sellPrice,
             quantity = book.quantity,
+            publisher=book.publisher,
             description = book.description,
             images = bookTypeInput.images?.Select(i => new ImageResult
             {
@@ -121,10 +122,11 @@ public class BookMutation
             }),
             message = "Sản phẩm mới vừa ra mắt"
         };
+
         await topicEventSender.SendAsync(nameof(BookSupscription.BookCreated),bookResult);
         return bookResult;
     }
-    public async Task<BookResult> UpdateBook(int id, BookType bookTypeInput)
+    public async Task<BookResult> UpdateBook(int id, BookInput bookTypeInput, int authorId, List<int> categoryIds)
     {
         Book bookDTO = new Book()
         {
@@ -134,8 +136,9 @@ public class BookMutation
             listedPrice = bookTypeInput.listedPrice,
             sellPrice = bookTypeInput.sellPrice,
             quantity = bookTypeInput.quantity,
+            publisher=bookTypeInput.publisher,
             description = bookTypeInput.description,
-            //author = bookTypeInput.author,
+            authorId= authorId,
         };
         bookDTO = await _bookRepository.UpdateBook(bookDTO);
         if (bookTypeInput.images != null && bookTypeInput.images.Any())
@@ -155,6 +158,15 @@ public class BookMutation
                 await _imageRepository.UpdateImage(image);
             }
         }
+        foreach (int categoryId in categoryIds)
+        {
+            BookCategory bookCategory = new BookCategory()
+            {
+                categoriescategoryId = categoryId,
+                booksbookId = id,
+            };
+            bookCategory = await _bookCategoryRepository.UpdateBookCategory(bookCategory);
+        }
         BookResult bookResult = new BookResult()
         {
             bookId = bookDTO.bookId,
@@ -163,8 +175,8 @@ public class BookMutation
             listedPrice = bookDTO.listedPrice,
             sellPrice = bookDTO.sellPrice,
             quantity = bookDTO.quantity,
+            publisher = bookDTO.publisher,
             description = bookDTO.description,
-            //author = bookDTO.author,
             images = bookTypeInput.images?.Select(i => new ImageResult
             {
                 imageName = i.imageName,
@@ -402,6 +414,13 @@ public class BookMutation
         }
 
     }
+    public async Task<bool> UpdatePoint(int userId,int point)
+    {
+        User user= await _userRepository.GetUserById(userId) ;
+        user.point = point;
+        var result=await _userRepository.UpdatePoint(user);
+        return result;
+    }
 
     //WishList
     public async Task<WishListResult> AddWishlist(int userId,int bookId)
@@ -581,6 +600,10 @@ public class BookMutation
                 sellPrice = carDetail.sellPrice
             };
             orderDetail= await _orderDetailRepository.CreateOrderDetail(orderDetail);
+        }
+        foreach(var carDetail in selectedCartDetails)
+        {
+            await _cartDetailRepository.deleteCartDetail(carDetail.cartDetailId);
         }
         return new OrderResult()
         {

@@ -16,6 +16,7 @@ namespace AppSellBook.Entities
         public int? point {  get; set; }
         public string? purchaseAddress { get; set; }
         public string? deliveryAddress { get; set; }
+        public bool isBlock {  get; set; }
         public IEnumerable<RoleUser> roleUsers { get; set; }
         public IEnumerable<Notification> notifications { get; set; }
         public IEnumerable<Cart> carts { get; set; }

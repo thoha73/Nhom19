@@ -20,5 +20,15 @@ namespace AppSellBook.Services.Books
                 return bookCategory;
             }
         }
+
+        public async Task<BookCategory> UpdateBookCategory(BookCategory bookCategory)
+        {
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                context.BookCategory.Update(bookCategory);
+                await context.SaveChangesAsync();
+                return bookCategory;
+            }
+        }
     }
 }

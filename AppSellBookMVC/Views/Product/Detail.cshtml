@@ -61,7 +61,24 @@
                 </div>
                 <div class="form-group">
                     <label for="inputTacgia">Tác giả</label>
-                    <input type="text" class="form-control" id="inputTacgia" name="tacgia" placeholder="Nhập tác giả" value="@((Model.author!=null)? Model.author:"Tác giả" )" />
+                    <select class="form-control Selected2" id="inputTacgia" name="tacgia">
+                        @foreach (var author in ViewBag.authors)
+                        {
+                            bool isSelected = ViewBag.selectedAuthor==author.authorId;
+                            @if (isSelected)
+                            {
+                                <option value="@author.authorId" selected>
+                                    @author.authorName
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@author.authorId">
+                                    @author.authorName
+                                </option>
+                            }
+                        }
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="inputISBN">ISBN</label>
@@ -69,42 +86,29 @@
                 </div>
                 <div class="form-group">
                     <label for="inputTheloai">Thể loại</label>
-                    <select class="form-select" id="inputTheloai" name="theloai" multiple>
-                                                @foreach (var category in Model.categories)
+                    <select class="form-control Selected2" id="inputTheloai" name="theloai" >
+                        @foreach (var category in ViewBag.categories)
                         {
-                        @* <option value="@category.categoryId"
-                        selected="@((ViewBag.selected.Contains(category.categoryId)) ? "selected" : "")">
-                        @category.categoryName
-                        </option> *@
-                         @if (category.categoryId==(category.categoryId))
-                        {
-                        <option value="@category.categoryId" selected>
-                        @category.categoryName
-                        </option>
+                            bool isSelected = ViewBag.selectedCategories.Contains(category.categoryId);
+                            @if (isSelected)
+                            {
+                                <option value="@category.categoryId" selected>
+                                    @category.categoryName
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@category.categoryId">
+                                    @category.categoryName
+                                </option>
+                            }
                         }
-                        else
-                        {
-                        <option value="@category.categoryId">
-                        @category.categoryName
-                        </option>
-                        }
-                        }
-                       @*  @foreach (var category in ViewBag.Categories)
-                        {
-                            // Kiểm tra xem thể loại có thuộc về sách này hay không
-                            bool isSelected = ViewBag.SelectedCategories.Contains(category.categoryId);
-                            <option value="@category.categoryId" @(isSelected ? "selected" : "")>
-                                @category.categoryName
-                            </option>
-                        }
-                        } *@
                     </select>
-
 
                 </div>
                 <div class="form-group">
                     <label for="inputNXB">Nhà xuất bản</label>
-                    <input type="text" class="form-control" id="inputNXB" name="nhaxuatban" value="Nhà xuất bản" placeholder="Nhập nhà xuất bản">
+                    <input type="text" class="form-control" id="inputNXB" name="nhaxuatban" value="@((Model.publisher!=null)? Model.publisher:"Nhà xuất bản" )" placeholder="Nhập nhà xuất bản">
                 </div>
                 <div class="form-group">
                     <label for="inputGia">Giá bán</label>

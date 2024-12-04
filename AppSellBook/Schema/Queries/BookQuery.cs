@@ -297,6 +297,7 @@ namespace AppSellBook.Schema.Queries
             User userDTO= await _userRepository.GetUserById(userId);
             return new UserResult()
             {
+                userId = userId,
                 firstName = userDTO.firstName,
                 lastName = userDTO.lastName,
                 password = userDTO.password,
@@ -307,7 +308,26 @@ namespace AppSellBook.Schema.Queries
                 deliveryAddress = userDTO.deliveryAddress,
                 dateOfBirth=userDTO.dateOfBirth,
                 point = userDTO.point,
+                isBlock = userDTO.isBlock,
             };
+        }
+        public async Task<IEnumerable<UserResult>> GetUsers()
+        {
+            IEnumerable<User> users= await _userRepository.GetAllUser();
+            return users.Select(u=>new UserResult()
+            {
+                username= u.username,
+                password= u.password,
+                point = u.point,
+                email=u.email,
+                phone=u.phone,
+                gender=u.gender,
+                dateOfBirth = u.dateOfBirth,
+                deliveryAddress=u.deliveryAddress,
+                firstName=u.firstName,
+                isBlock=u.isBlock,
+
+            }).ToList();
         }
         //Order
 

@@ -7,5 +7,6 @@
         public BookCreated bookCreated { get; set; }
         public Book bookById {  get; set; }
         public List<Category> categories { get; set; }
+        public List<Author> authors { get; set; }
     }
 }

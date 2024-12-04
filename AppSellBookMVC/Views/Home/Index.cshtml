@@ -81,7 +81,7 @@
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Sản phẩm</h6>
-                    <div class="ml-auto delete-icon mr-3" style="cursor:pointer"><i class="fa-solid fa-trash"></i></div>
+                    <div class="ml-auto delete-icon mr-3" style="cursor:pointer" onclick="deleteSelectedProducts()"><i class="fa-solid fa-trash"></i></div>
                     <div class="dropdown no-arrow">
                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -127,7 +127,7 @@
                                     <div class="col">Thể loại:@category</div>
                                 </div>
                                 <div class="row justify-content-between align-items-center" style="padding: 8px 0;">
-                                    <div class="col">Nhà xuất bản: @book.isbn</div>
+                                    <div class="col">Nhà xuất bản: @book.publisher</div>
                                     <div class="col">Giá bán: @book.sellPrice</div>
                                     <div class="col">Mô tả: @book.description</div>
                                 </div>
@@ -418,64 +418,46 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.0/signalr.min.js"></script>
 <script>
-    // Tạo kết nối tới SignalR Hub
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/bookHub")
-        .build();
+    function deleteSelectedProducts() {
+        // Lấy tất cả các checkbox được chọn
+        const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
 
-    // Lắng nghe thông điệp từ server
-    connection.on("ReceiveMessage", function (message, bookName, isbn, sellPrice, description) {
-        console.log(message);
-        console.log(bookName);
-        console.log(isbn);
-        console.log(sellPrice);
-        console.log(description);
-    });
-
-    // Khởi tạo kết nối
-    connection.start().catch(function (err) {
-        return console.error(err.toString());
-    });
-    document.addEventListener("DOMContentLoaded", function () {
-        // Sự kiện click nút xóa
-        document.querySelector(".delete-icon").addEventListener("click", async function () {
-            const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-            if (checkedBoxes.length === 0) {
-                alert("Vui lòng chọn ít nhất một sản phẩm để xóa!");
-                return;
-            }
-
-            if (confirm("Bạn có chắc chắn muốn xóa các sản phẩm đã chọn không?")) {
-                // Lấy danh sách các bookId từ các checkbox đã chọn
-                const bookIds = Array.from(checkedBoxes).map(checkbox =>
-                    checkbox.closest(".row").getAttribute("data-book-id")
-                );
-                console.log(bookIds);
-                try {
-                    // Gửi yêu cầu xóa
-                    const response = await fetch('/Product/deleteProducts', {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: { bookIds } // Gửi bookIds dưới dạng JSON
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok && result.success) {
-                        // Xóa dòng sản phẩm khỏi giao diện
-                        checkedBoxes.forEach(checkbox => checkbox.closest(".row").remove());
-                        alert("Xóa thành công!");
-                    } else {
-                        alert("Có lỗi xảy ra: " + result.message);
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("Không thể kết nối đến server!");
-                }
+        // Lấy ID của những sản phẩm được chọn
+        const selectedIds = [];
+        selectedCheckboxes.forEach(checkbox => {
+            const bookId = checkbox.closest('.row').getAttribute('data-book-id');
+            if (bookId) {
+                selectedIds.push(parseInt(bookId)); // Đảm bảo ID là số nguyên
             }
         });
-    });
+
+        if (selectedIds.length > 0) {
+            // Gửi request DELETE tới backend với danh sách ID sản phẩm
+            fetch('/Product/deleteProducts', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(selectedIds),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Sản phẩm đã được xóa thành công!');
+                        // Tải lại trang hoặc cập nhật lại giao diện nếu cần
+                        location.reload();
+                    } else {
+                        alert('Xóa sản phẩm thất bại: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã có lỗi xảy ra!');
+                });
+        } else {
+            alert('Vui lòng chọn ít nhất một sản phẩm để xóa.');
+        }
+    }
+
 
 </script>

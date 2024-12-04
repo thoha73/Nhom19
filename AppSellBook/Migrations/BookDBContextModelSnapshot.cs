@@ -409,6 +409,9 @@ namespace AppSellBook.Migrations
                     b.Property<string>("gender")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isBlock")
+                        .HasColumnType("bit");
+
                     b.Property<string>("lastName")
                         .HasColumnType("nvarchar(max)");
 

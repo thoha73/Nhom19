@@ -5,6 +5,7 @@
         public int bookId { get; set; }
         public string bookName { get; set; }
         public string description { get; set; }
+        public string publisher { get; set; }
         public string isbn { get; set; }
         public double listedPrice { get; set; }
         public double sellPrice { get; set; }

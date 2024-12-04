@@ -35,9 +35,11 @@ namespace AppSellBookMVC.Controllers
                             description
                             isbn
                             listedPrice
+                            publisher
                             sellPrice
                             quantity
                             author{
+                                authorId
                                 authorName
                             }
                             rank

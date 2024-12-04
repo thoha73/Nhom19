@@ -58,9 +58,15 @@
                     <input type="text" class="form-control" id="inputTensach" name="tensach" aria-describedby="title"
                            placeholder="Nhập tên sách">
                 </div>
+
                 <div class="form-group">
                     <label for="inputTacgia">Tác giả</label>
-                    <input type="text" class="form-control" id="inputTacgia" name="tacgia" placeholder="Nhập tác giả">
+                    <select class="form-control select2" id="inputTacgia" name="author" >
+                        @foreach (var item in ViewBag.Authors)
+                        {
+                            <option value="@item.authorId">@item.authorName</option>
+                        }
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="inputISBN">ISBN</label>
@@ -79,11 +85,11 @@
                 </div> *@
                 <div class="form-group">
                     <label for="inputTheloai">Thể loại</label>
-                    <select class="form-control select2" id="inputTheloai" name="categories" multiple>
-@*                         @foreach (var item in ViewBag.Categories)
+                    <select class="form-control  select2" id="inputTheloai" name="categories">
+                        @foreach (var item in ViewBag.Categories)
                         {
                             <option value="@item.categoryId">@item.categoryName</option>
-                        } *@
+                        }
                     </select>
                 </div>
                 <div class="form-group">

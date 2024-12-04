@@ -167,5 +167,21 @@ namespace AppSellBook.Services.Users
                 return useExist;
             }
         }
+
+        public async Task<bool> UpdatePoint(User user)
+        {
+
+                using (BookDBContext context = _contextFactory.CreateDbContext())
+                {
+                    var useExist = await context.Users.FindAsync(user.userId);
+                    if (useExist != null)
+                    { 
+                        useExist.point = user.point;
+                    }
+                    context.Users.Update(useExist);
+                    
+                    return await context.SaveChangesAsync()>0;
+            }
+        }
     }
 }
