@@ -72,17 +72,6 @@
                     <label for="inputISBN">ISBN</label>
                     <input type="text" class="form-control" id="inputISBN" name="isbn" placeholder="Nhập ISBN">
                 </div>
-                @* <div class="form-group">
-                    <label for="inputTheloai">Thể loại</label>
-                    <select type="text" class="form-control" id="inputTheloai" multiple>
-                        @foreach(var item in ViewBag.Categories)
-                        {
-                            <option value="@item.categoryId">
-                                @item.categoryName
-                             </option>
-                        }
-                    </select>
-                </div> *@
                 <div class="form-group">
                     <label for="inputTheloai">Thể loại</label>
                     <select class="form-control  select2" id="inputTheloai" name="categories">
@@ -128,39 +117,7 @@
                     style="color: black; font-size: 26px; font-weight: bold; padding-top: 10px;">
                     Hình ảnh
                     giới thiệu
-                </h4>
-                @* <div class="d-flex justify-content-center mt-4">
-                    <div id="preview-container" class="d-flex gap-3">
-                        <img id="preview1" name="preview1" class="preview-img" style="width: 80px; height: 100px; display: none;">
-                        <img id="preview2" name="preview2" class="preview-img" style="width: 80px; height: 100px; display: none;">
-                        <img id="preview3" name="preview3" class="preview-img" style="width: 80px; height: 100px; display: none;">
-                    </div>
-                </div>
-                <!-- Nút dành riêng cho hình ảnh giới thiệu -->
-                <div class="d-flex justify-content-center mt-3">
-                    <input type="file" id="file-input-preview" class="file-input"
-                           style="display: none;" />
-                    <button type="button" class="btn btn-primary"
-                            onclick="document.getElementById('file-input-preview').click();">
-                        Thêm ảnh1
-                    </button>
-                </div>
-                <div class="d-flex justify-content-center mt-3">
-                    <input type="file" id="file-input-preview" class="file-input"
-                           style="display: none;" />
-                    <button type="button" class="btn btn-primary"
-                            onclick="document.getElementById('file-input-preview').click();">
-                        Thêm ảnh2
-                    </button>
-                </div>
-                <div class="d-flex justify-content-center mt-3">
-                    <input type="file" id="file-input-preview" class="file-input"
-                           style="display: none;" />
-                    <button type="button" class="btn btn-primary"
-                            onclick="document.getElementById('file-input-preview').click();">
-                        Thêm ảnh3
-                    </button>
-                </div> *@
+                </h4>      
                 <div class="d-flex justify-content-center mt-4">
                     <div id="preview-container" class="d-flex gap-3">
                         <img id="preview1" name="preview1" class="preview-img" style="width: 80px; height: 100px; display: none;">

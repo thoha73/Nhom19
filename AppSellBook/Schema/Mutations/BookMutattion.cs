@@ -13,6 +13,7 @@ using AppSellBook.Services.OrderDetails;
 using AppSellBook.Services.Orders;
 using AppSellBook.Services.PasswordHashers;
 using AppSellBook.Services.Roles;
+using AppSellBook.Services.Students;
 using AppSellBook.Services.Users;
 using AppSellBook.Services.WishLists;
 using HotChocolate.Subscriptions;
@@ -37,12 +38,13 @@ public class BookMutation
     private readonly IOrderDetailRepository _orderDetailRepository;
     private readonly IBookCategoryRepository _bookCategoryRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IStudentRepository _studentRepository;
     public BookMutation(IBookRepository bookRepository, IImageRepository imageRepository,
                         ICategoryRepository categoryRepository,ICommentationRepository commentationRepository,
                         IUserRepository userRepository ,IPasswordHashser passwordHashser,IRoleRepository roleRepository,
                         IRoleUserRepository roleUserRepository, IWishListRepository wishListRepository, IBookWishListRepository bookWishListRepository,
                         ICartRepository cartRepository,ICartDetailRepository cartDetailRepository,IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository,
-                        IBookCategoryRepository bookCategoryRepository, INotificationRepository notificationRepository)
+                        IBookCategoryRepository bookCategoryRepository, INotificationRepository notificationRepository,IStudentRepository studentRepository)
     {
         _bookRepository = bookRepository;
         _imageRepository = imageRepository;
@@ -60,7 +62,27 @@ public class BookMutation
         _orderDetailRepository= orderDetailRepository;
         _bookCategoryRepository = bookCategoryRepository;
         _notificationRepository = notificationRepository;
+        _studentRepository = studentRepository;
 
+    }
+    //Student
+    public async Task<Student> CreateStudent(Student student)
+    {
+        Student st= await _studentRepository.CreateStudent(student);
+        return st;
+    }
+    public async Task<Student> UpdateStudent(Student student)
+    {
+        Student st = await _studentRepository.UpdateStudent(student);
+        return st;
+    }
+    public async Task<bool> DeleteStudent(string studentId)
+    {
+        Student student = new Student
+        {
+            studentId = studentId
+        };
+        return await _studentRepository.DeleteStudent(student);
     }
     //Book
     public async Task<BookResult> CreateBook(BookInput bookTypeInput,int authorId,List<int> categoryIds ,[Service] ITopicEventSender topicEventSender)
@@ -327,7 +349,33 @@ public class BookMutation
             userId=userId,
             username = user.username,
             password = user.password,
+            firstName=user.firstName
         };
+    }
+    public async Task<bool> UpdateLock(int userId, bool isBlock)
+    {
+
+        User user = await _userRepository.GetUserById(userId);
+        if(user == null)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Tài khoản đã tồn tại. Vui lòng nhập tài khoản khác",
+                Details = "Lỗi khi đã tồn tại 1 tài khoản"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        user.isBlock = isBlock;
+        user = await _userRepository.UpdateUser2(user);
+        if (user!=null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     public async Task<UserResult> Login(AppSellBook.Schema.Inputs.LoginRequest loginRequest)
     {
@@ -353,11 +401,22 @@ public class BookMutation
             };
             throw new GraphQLException(errorResponse.Message);
         }
+        if (userByUsername.isBlock)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 400,
+                Message = "Tài khoản của bạn đã bị khóa!",
+                Details = "Lỗi khi sử dụng tài khoản"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
         return new UserResult()
         {
             userId = userByUsername.userId,
             username = userByUsername.username,
-            lastName=userByUsername.lastName,
+            point=userByUsername.point,
+            firstName=userByUsername.firstName,
             roleUsers=userByUsername.roleUsers.Select(r=>new RoleUserResult
             {
                 rolesroleId=r.rolesroleId
@@ -470,6 +529,31 @@ public class BookMutation
             wishListName = wishListExist.wishListName
         };
     }
+    public async Task<bool> CheckWishList(int userId, int bookId)
+    {
+        WishList wishListExist = await _wishListRepository.GetWishListByUserId(userId); 
+        Book book = await _bookRepository.GetBookById(bookId);
+        if (book == null)
+        {
+            var errorResponse = new ErrorResponse
+            {
+                StatusCode = 404,
+                Message = "Sách không tồn tại",
+                Details = "Lỗi"
+            };
+            throw new GraphQLException(errorResponse.Message);
+        }
+        bool exists = await _bookWishListRepository.existsInBookWishList(wishListExist.wishListId, book.bookId);
+        if (exists)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+       
+    }
     //Carts
 
     public async Task<bool> UpdateCheckBox(int cartDetailId, bool isSelected)
@@ -572,7 +656,7 @@ public class BookMutation
         }
     }
     //Orders
-    public async Task<OrderResult> AddOrder(int userId)
+    public async Task<OrderResult> AddOrder(int userId, int point)
     {
         Cart cartExist= await _cartRepository.GetCartByUserId(userId);
         var selectedCartDetails = cartExist.cartDetails.Where(cd => cd.isSelected).ToList();
@@ -590,6 +674,7 @@ public class BookMutation
 
         };
         order=await _orderRepository.CreateOrder(order);
+        double total = 0;
         foreach(var carDetail in selectedCartDetails)
         {
             OrderDetail orderDetail = new OrderDetail()
@@ -599,8 +684,28 @@ public class BookMutation
                 quantity = carDetail.quantity,
                 sellPrice = carDetail.sellPrice
             };
+            total += orderDetail.quantity * orderDetail.sellPrice;
             orderDetail= await _orderDetailRepository.CreateOrderDetail(orderDetail);
+            Book book = await _bookRepository.GetBookById(orderDetail.bookId);
+            if (book.quantity - orderDetail.quantity < 0)
+            {
+                var errorResponse = new ErrorResponse
+                {
+                    StatusCode = 404,
+                    Message = "Số lượng trong shop không đủ.Vui lòng chọn lại số lượng!",
+                    Details = "Lỗi khi đặt hàng!"
+                };
+                throw new GraphQLException(errorResponse.Message);
+            }
+            else
+            {
+                book.quantity= orderDetail.quantity;
+                book = await _bookRepository.UpdateQuantityBook(book);
+            }
+           
         }
+        order.totalMoney= total-point;
+        order = await _orderRepository.Update(order);
         foreach(var carDetail in selectedCartDetails)
         {
             await _cartDetailRepository.deleteCartDetail(carDetail.cartDetailId);
@@ -608,6 +713,7 @@ public class BookMutation
         return new OrderResult()
         {
             orderId = order.orderId,
+            totalMoney=order.totalMoney,
         };
     }
     public async Task<bool> RemoveOrder(int orderId)

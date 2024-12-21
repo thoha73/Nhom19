@@ -12,6 +12,7 @@ using AppSellBook.Services.OrderDetails;
 using AppSellBook.Services.Orders;
 using AppSellBook.Services.PasswordHashers;
 using AppSellBook.Services.Roles;
+using AppSellBook.Services.Students;
 using AppSellBook.Services.Users;
 using AppSellBook.Services.WishLists;
 using HotChocolate.AspNetCore;
@@ -63,6 +64,7 @@ builder.Services.AddScoped<IBookWishListRepository, BookWishListRepository>();
 builder.Services.AddScoped<IBookCategoryRepository, BookCategoryRepository>();
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<BookQuery>(); 
 builder.Services.AddScoped<CategoryQuery>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

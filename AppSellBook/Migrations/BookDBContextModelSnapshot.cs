@@ -315,6 +315,9 @@ namespace AppSellBook.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("totalMoney")
+                        .HasColumnType("float");
+
                     b.Property<int>("userId")
                         .HasColumnType("int");
 
@@ -384,6 +387,28 @@ namespace AppSellBook.Migrations
                     b.HasIndex("rolesroleId");
 
                     b.ToTable("RoleUser");
+                });
+
+            modelBuilder.Entity("AppSellBook.Entities.Student", b =>
+                {
+                    b.Property<string>("studentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("grade")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("studentName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("studentId");
+
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("AppSellBook.Entities.User", b =>

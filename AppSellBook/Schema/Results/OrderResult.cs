@@ -11,5 +11,6 @@ namespace AppSellBook.Schema.Results
         public int paymentMethod { get; set; }
         public IEnumerable<OrderDetailResult> orderDetails { get; set; }
         public UserResult user { get; set; }
+        public double totalMoney { get; set; }
     }
 }

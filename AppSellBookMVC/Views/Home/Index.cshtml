@@ -23,7 +23,7 @@
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Số lượng sách
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.BookCount</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.BookCounts</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -199,85 +199,71 @@
                     <h6 class="m-0 font-weight-bold text-primary">Tài khoản người dùng</h6>
                 </div>
                 <div class="card-body" style="height: 500px ; overflow-y: auto;">
-                    <div class="row mb-2" style="background-color: antiquewhite;">
-                        <div class="col-2" style="padding:10px ;">
-                            <img src="/img/avatar.jpg" alt="Avartar" style="width: 100px; height: 100px;">
-                        </div>
-                        <div class="col-8" style="margin:10px 0; padding: 0 10px 0 30px ;">
-                            <div class="">Người dùng: Võ Vĩ Khương</div>
-                            <div class="mt-3">Tên đăng nhập: vikuong92</div>
-                            <div class="mt-1">Mật khẩu: ********</div>
-                        </div>
-                        <div class="col-2 " style="padding: 0;">
-                            <div class="d-flex justify-content-center align-items-center" style="padding-top: 10px;">
-                                <span><i class="fa-solid fa-lock-open" style="font-size: 30px;"></i></span>
+                    @foreach(var item in ViewBag.Users)
+                    {
+                        <div class="row mb-2" style="background-color: antiquewhite;">
+                            <div class="col-2" style="padding:10px ;">
+                                <img src="/img/avatar.jpg" alt="Avartar" style="width: 100px; height: 100px;">
                             </div>
-                            <div class="d-flex justify-content-between align-items-center" style="padding-top: 10px; margin: 26px 10px 5px 10px;">
-                                <span>Chi tiết</span>
-                                <span><i class="fa-regular fa-pen-to-square" style="font-size: 16px;"></i></span>
+                            <div class="col-8" style="margin:10px 0; padding: 0 10px 0 30px ;">
+                                <div class="">Người dùng: @item.firstName</div>
+                                <div class="mt-3">Tên đăng nhập: @item.username</div>
+                                <div class="mt-1">
+                                    Mật khẩu:
+                                    @if (!string.IsNullOrEmpty(item.password))
+                                    {
+                                        string maskedPassword = new string('*', Math.Min(8, item.password.Length)); 
+                                        if (item.password.Length > 8)
+                                        {
+                                            maskedPassword += "...";
+                                        }
+                                        @maskedPassword
+                                    }
+                                    else
+                                    {
+                                        @("Không có mật khẩu")
+                                    }
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2" style="background-color: antiquewhite;">
-                        <div class="col-2" style="padding: 10px ;">
-                            <img src="/img/avatar.jpg" alt="Avartar" style="width: 100px; height: 100px;">
-                        </div>
-                        <div class="col-8" style="margin:10px 0; padding: 0 10px 0 30px ;">
-                            <div class="">Người dùng: Phan Anh Duy</div>
-                            <div class="mt-3">Tên đăng nhập: anhduy76</div>
-                            <div class="mt-1">Mật khẩu: ********</div>
-                        </div>
-                        <div class="col-2 " style="padding: 0;">
-                            <div class="d-flex justify-content-center align-items-center" style="padding-top: 10px;">
-                                <span><i class="fa-solid fa-lock-open" style="font-size: 30px;"></i></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center" style="padding-top: 10px; margin: 26px 10px 5px 10px;">
-                                <span>Chi tiết</span>
-                                <span><i class="fa-regular fa-pen-to-square" style="font-size: 16px;"></i></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-2" style="background-color: antiquewhite;">
-                        <div class="col-2" style="padding: 10px ;">
-                            <img src="/img/avatar.jpg" alt="Avartar" style="width: 100px; height: 100px;">
-                        </div>
-                        <div class="col-8" style="margin:10px 0; padding: 0 10px 0 30px ;">
-                            <div class="">Người dùng: Trần Thanh Vỹ</div>
-                            <div class="mt-3">Tên đăng nhập: thanhvy92</div>
-                            <div class="mt-1">Mật khẩu: ********</div>
-                        </div>
-                        <div class="col-2 " style="padding: 0;">
-                            <div class="d-flex justify-content-center align-items-center" style="padding-top: 10px;">
-                                <span><i class="fa-solid fa-lock-open" style="font-size: 30px;"></i></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center" style="padding-top: 10px; margin: 26px 10px 5px 10px;">
-                                <span>Chi tiết</span>
-                                <span><i class="fa-regular fa-pen-to-square" style="font-size: 16px;"></i></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-2" style="background-color: antiquewhite;">
-                        <div class="col-2" style="padding: 10px ;">
-                            <img src="/img/avatar.jpg" alt="Avartar" style="width: 100px; height: 100px;">
-                        </div>
-                        <div class="col-8" style="margin:10px 0; padding: 0 10px 0 30px ;">
-                            <div class="">Người dùng: Nguyễn Thọ Hà</div>
-                            <div class="mt-3">Tên đăng nhập: thoha73</div>
-                            <div class="mt-1">Mật khẩu: ********</div>
-                        </div>
-                        <div class="col-2 " style="padding: 0;">
-                            <div class="d-flex justify-content-center align-items-center" style="padding-top: 10px;">
-                                <span><i class="fa-solid fa-lock-open" style="font-size: 30px;"></i></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center" style="padding-top: 10px; margin: 26px 10px 5px 10px;">
-                                <span>Chi tiết</span>
-                                <span><i class="fa-regular fa-pen-to-square" style="font-size: 16px;"></i></span>
+                            <div class="col-2 " style="padding: 0;">
+                                <div class="d-flex justify-content-center align-items-center" style="padding-top: 10px;">
+                                    <span>
+                                       @*  @if (item.isBlock)
+                                        {
+                                            <a href="javascript:void(0);" onclick="updateBlock(@item.userId, false)">
+                                                <i class="fa-solid fa-lock" style="font-size: 30px; cursor: pointer;"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a href="javascript:void(0);" onclick="updateBlock(@item.userId, true)">
+                                                <i class="fa-solid fa-lock-open" style="font-size: 30px; cursor: pointer;"></i>
+                                            </a>
+                                        }
+                                         *@
+                                        <form method="post" action="@Url.Action("UpdateBlock", "Home")" style="display: inline;">
+                                            <input type="hidden" name="userId" value="@item.userId" />
+                                            <input type="hidden" name="isBlock" value="@(item.isBlock==false?"true":"false")" />
+                                            <button type="submit" style="background: none; border: none; cursor: pointer;">
+                                                @if (item.isBlock)
+                                                {
+                                                    <i class="fa-solid fa-lock" style="font-size: 30px;"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fa-solid fa-lock-open" style="font-size: 30px;"></i>
+                                                }
+                                            </button>
+                                        </form>
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center" style="padding-top: 10px; margin: 26px 10px 5px 10px;">
+                                    <span>Chi tiết</span>
+                                    <span><i class="fa-regular fa-pen-to-square" style="font-size: 16px;"></i></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                    }
                 </div>
                 <div class="card-footer text-center" style="padding: 8px;"><a href="#">Xem thêm</a></div>
             </div>
@@ -458,6 +444,25 @@
             alert('Vui lòng chọn ít nhất một sản phẩm để xóa.');
         }
     }
+    // async function updateBlock(userId, isBlock) {
+    //     try {
+    //         const response = await fetch('@Url.Action("UpdateBlock", "Home")', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({ userId, isBlock })
+    //         });
+
+    //         if (response.ok) {
+    //             location.reload();
+    //         } else {
+    //             console.error('Failed to update block status');
+    //         }
+    //     } catch (error) {
+    //         console.error('An error occurred:', error);
+    //     }
+    // }
 
 
 </script>

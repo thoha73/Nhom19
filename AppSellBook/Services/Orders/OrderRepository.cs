@@ -42,6 +42,14 @@ namespace AppSellBook.Services.Orders
             }
         }
 
+        public async Task<IEnumerable<Order>> GetAllOrder()
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                return await context.Orders.Include(u=>u.user).Include(r=>r.orderDetails).Where(o=>o.orderStatus.Equals("Success")).ToListAsync();
+            }
+        }
+
         public async Task<Entities.Order> GetOrderById(int orderId)
         {
             using (BookDBContext context = _contextFactory.CreateDbContext())
@@ -61,6 +69,18 @@ namespace AppSellBook.Services.Orders
                                             .ThenInclude(b=>b.book)
                                             .Where(r=>r.orderStatus.Equals("Processing")).ToListAsync();
                 return orders;
+            }
+        }
+
+        public async Task<Order> Update(Order order)
+        {
+            using(BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                context.Attach(order);
+                context.Orders.Update(order);
+                await context.SaveChangesAsync();
+                Order updatedOrder = await context.Orders.FirstOrDefaultAsync(o => o.orderId == order.orderId);
+                return updatedOrder;
             }
         }
     }

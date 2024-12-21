@@ -1,4 +1,5 @@
 ﻿using AppSellBook.Entities;
+using AppSellBook.Schema.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppSellBook.Services.Books
@@ -107,6 +108,31 @@ namespace AppSellBook.Services.Books
                 context.Books.Update(book);
                 await context.SaveChangesAsync();
                 return book;
+            }
+        }
+
+        public async Task<Book> UpdateQuantityBook(Book book)
+        {
+            using (BookDBContext context = _contextFactory.CreateDbContext())
+            {
+                Book book1 = await context.Books.FirstOrDefaultAsync(b => b.bookId == book.bookId);
+                if (book1 == null) throw new Exception("Book not found");
+                if(book1.bookId - book.bookId < 0)
+                {
+                    var errorResponse = new ErrorResponse
+                    {
+                        StatusCode = 404,
+                        Message = "Số lượng trong kho không đủ. Vui lòng chọn lại số lượng!",
+                        Details = "Lỗi khi đặt hàng số lượng"
+                    };
+                    throw new GraphQLException(errorResponse.Message);
+                }
+                else
+                {
+                    book1.quantity = book1.quantity - book.quantity;
+                    await context.SaveChangesAsync();
+                    return book1;
+                }
             }
         }
     }

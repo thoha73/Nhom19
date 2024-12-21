@@ -134,8 +134,8 @@ namespace AppSellBook.Services.Users
                     useExist.gender = user.gender;
                     useExist.email = user.email;
                     useExist.point = user.point == null ? 0 : user.point;
+                    useExist.isBlock=user.isBlock;
                 }
-                context.Users.Update(useExist);
                 await context.SaveChangesAsync();
                 return user;
             }

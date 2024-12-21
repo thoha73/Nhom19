@@ -1,5 +1,6 @@
 using AppSellBookMVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -69,10 +70,13 @@ namespace AppSellBookMVC.Controllers
                     Console.WriteLine(jsonResponse);
                     var result = JsonConvert.DeserializeObject<GraphQLResponse>(jsonResponse);
                     Console.WriteLine($"BookCount: {result?.data.bookCount}");
-                    ViewBag.BookCount = result?.data.bookCount ?? 0;
+
+                    int soluong= result.data.bookCount ;
+                    ViewBag.BookCounts= soluong;
                     ViewBag.Books = result?.data.books ?? new List<Book>();
+                    ViewBag.Users = await GetUser();
                     await StartBookSubscription();
-                    return View();
+                    return View(soluong);
                 }
                 else
                 {
@@ -87,6 +91,92 @@ namespace AppSellBookMVC.Controllers
             }
             
            
+        }
+        public async Task<List<User>> GetUser()
+        {
+            var query = new
+            {
+                query = @"
+                    query{
+                      users{
+                        userId
+                        point
+                        deliveryAddress
+                        username
+                        password
+                        gender
+                        phone
+                        email
+                        isBlock
+                      }
+                    }
+                "
+            };
+            var queryJson = JsonConvert.SerializeObject(query);
+            Console.WriteLine(queryJson);
+            var content = new StringContent(queryJson, Encoding.UTF8, "application/json");
+            try
+            {
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(jsonResponse);
+                    var result = JsonConvert.DeserializeObject<GraphQLResponse>(jsonResponse);
+                    Console.WriteLine($"BookCount: {result?.data.bookCount}");
+                    ViewBag.BookCount = result?.data.bookCount ?? 0;
+                    List<User> list= result?.data.users ?? new List<User>();
+                    ViewBag.Users = list;
+                    return list;
+                }
+                else
+                {
+                    ViewBag.Error = "Failed to load data from GraphQL API.";
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = $"An error occurred: {ex.Message}";
+                return null;
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBlock(int userId, string isBlock)
+        {
+            string block = isBlock.ToString().ToLowerInvariant();
+            var query = new
+            {
+                query = $@"
+                    mutation{{
+                      updateLock(userId: {userId}, isBlock: {block} )
+                    }}"
+            };
+            var queryJson = JsonConvert.SerializeObject(query);
+            Console.WriteLine(queryJson);
+            var content = new StringContent(queryJson, Encoding.UTF8, "application/json");
+            try
+            {
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ViewBag.Error = "Failed to load data from GraphQL API.";
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = $"An error occurred: {ex.Message}";
+                return null;
+            }
         }
 
         private async Task StartBookSubscription()

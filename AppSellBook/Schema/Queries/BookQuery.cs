@@ -12,6 +12,7 @@ using AppSellBook.Services.OrderDetails;
 using AppSellBook.Services;
 using AppSellBook.Services.Orders;
 using AppSellBook.Services.Notifications;
+using AppSellBook.Services.Students;
 
 namespace AppSellBook.Schema.Queries
 {
@@ -27,9 +28,10 @@ namespace AppSellBook.Schema.Queries
         private readonly IAuthorRepository _authorRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly INotificationRepository _notificationRepository;
-        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository,IOrderRepository orderRepository,INotificationRepository notificationRepository,
-                        ICartDetailRepository cartDetailRepository,IWishListRepository wishListRepository,IUserRepository userRepository,IOrderDetailRepository orderDetailRepository,IAuthorRepository authorRepository)
-        { 
+        private readonly IStudentRepository _studentRepository;
+        public BookQuery(IBookRepository bookRepository, ICategoryRepository categoryRepository, ICommentationRepository commentationRepository, IOrderRepository orderRepository, INotificationRepository notificationRepository,
+                        ICartDetailRepository cartDetailRepository, IWishListRepository wishListRepository, IUserRepository userRepository, IOrderDetailRepository orderDetailRepository, IAuthorRepository authorRepository, IStudentRepository studentRepository)
+        {
             _bookRepository = bookRepository;
             _categoryRepository = categoryRepository;
             _commentationRepository = commentationRepository;
@@ -38,32 +40,39 @@ namespace AppSellBook.Schema.Queries
             _userRepository = userRepository;
             _orderDetailRepository = orderDetailRepository;
             _authorRepository = authorRepository;
-            _orderRepository= orderRepository;
-            _notificationRepository= notificationRepository;
+            _orderRepository = orderRepository;
+            _notificationRepository = notificationRepository;
+            _studentRepository = studentRepository;
+        }
+        //Students
+        public async Task<List<Student>> GetStudents()
+        {
+            List<Student> students = await _studentRepository.GetStudent();
+            return students;
         }
         //Books
         [UseSorting]
         public async Task<IEnumerable<BookType>> GetBooks()
         {
-           IEnumerable<Book> bookDTO= await _bookRepository.GetAllBooks();
+            IEnumerable<Book> bookDTO = await _bookRepository.GetAllBooks();
             return bookDTO.Select(b => new BookType()
             {
-                bookId=b.bookId,
+                bookId = b.bookId,
                 bookName = b.bookName,
                 ISBN = b.ISBN,
                 listedPrice = b.listedPrice,
                 sellPrice = b.sellPrice,
                 quantity = b.quantity,
                 description = b.description,
-                publisher=b.publisher,
-                author=b.author!=null?new AuthorType()
+                publisher = b.publisher,
+                author = b.author != null ? new AuthorType()
                 {
-                    authorId=b.author.authorId,
-                    authorName=b.author.authorName
-                }: new AuthorType()
+                    authorId = b.author.authorId,
+                    authorName = b.author.authorName
+                } : new AuthorType()
                 {
-                    authorId=-1,
-                    authorName="Unknown"
+                    authorId = -1,
+                    authorName = "Unknown"
                 },
                 rank = b.rank,
                 images = b.images.Select(i => new ImageType
@@ -123,10 +132,10 @@ namespace AppSellBook.Schema.Queries
             }); ;
         }
         public async Task<BookType> GetBookByIdAsync(int id) {
-            Book bookDTO= await _bookRepository.GetBookById(id);
+            Book bookDTO = await _bookRepository.GetBookById(id);
             return new BookType()
             {
-                bookId=bookDTO.bookId,
+                bookId = bookDTO.bookId,
                 bookName = bookDTO.bookName,
                 ISBN = bookDTO.ISBN,
                 listedPrice = bookDTO.listedPrice,
@@ -181,14 +190,14 @@ namespace AppSellBook.Schema.Queries
             {
                 categoryId = c.categoryId,
                 categoryName = c.categoryName,
-                
+
 
             });
         }
         //Commentations
         public async Task<IEnumerable<CommentationResult>> GetCommentationsByBookId(int bookId)
         {
-            IEnumerable<Commentation> commentDTO= await _commentationRepository.GetCommentationsByBookIdAsync(bookId);
+            IEnumerable<Commentation> commentDTO = await _commentationRepository.GetCommentationsByBookIdAsync(bookId);
             return commentDTO.Select(c => new CommentationResult()
             {
                 commentationId = c.commentationId,
@@ -201,13 +210,13 @@ namespace AppSellBook.Schema.Queries
                     firstName = c.user.firstName,
 
                 }
-            }); 
-            
+            });
+
         }
         //CartDetails
         public async Task<IEnumerable<CartDetailResult>> GetCartDetail(int userId)
         {
-            IEnumerable<CartDetail> cartDetailDTO= await _cartDetailRepository.GetBooksInCart(userId);
+            IEnumerable<CartDetail> cartDetailDTO = await _cartDetailRepository.GetBooksInCart(userId);
             return cartDetailDTO.Select(b => new CartDetailResult()
             {
                 cartDetailId = b.cartDetailId,
@@ -217,8 +226,8 @@ namespace AppSellBook.Schema.Queries
                 book = new BookResult()
                 {
                     bookId = b.bookId,
-                    bookName=b.book.bookName,
-                    images =(IEnumerable<ImageResult>) b.book.images.Where(i=>i.icon == true).Select(i => new ImageResult()
+                    bookName = b.book.bookName,
+                    images = (IEnumerable<ImageResult>)b.book.images.Where(i => i.icon == true).Select(i => new ImageResult()
                     {
                         imageName = i.imageName,
                         imageData = Convert.ToBase64String(i.imageData),
@@ -226,7 +235,7 @@ namespace AppSellBook.Schema.Queries
                     }).ToList(),
 
                 }
-            }).ToList() ;
+            }).ToList();
         }
         public async Task<IEnumerable<OrderDetailResult>> GetBookNotComment(int userId)
         {
@@ -236,7 +245,7 @@ namespace AppSellBook.Schema.Queries
                 orderDetailId = b.orderDetailId,
                 quantity = b.quantity,
                 sellPrice = b.sellPrice,
-                book = new BookResult()  
+                book = new BookResult()
                 {
                     bookId = b.book.bookId,
                     bookName = b.book.bookName,
@@ -248,7 +257,7 @@ namespace AppSellBook.Schema.Queries
                         imageData = Convert.ToBase64String(i.imageData)
                     }).ToList()
                 },
- 
+
             }).ToList();
         }
         public async Task<int> GetBookCountInCart(int userId)
@@ -277,7 +286,7 @@ namespace AppSellBook.Schema.Queries
                         icon = i.icon
                     }).ToList()
                 : new List<ImageResult>(),
-                author = bw.book.author != null  
+                author = bw.book.author != null
                 ? new AuthorResult()
                 {
                     authorId = bw.book.author.authorId,
@@ -294,7 +303,7 @@ namespace AppSellBook.Schema.Queries
         //User
         public async Task<UserResult> GetUserById(int userId)
         {
-            User userDTO= await _userRepository.GetUserById(userId);
+            User userDTO = await _userRepository.GetUserById(userId);
             return new UserResult()
             {
                 userId = userId,
@@ -306,26 +315,27 @@ namespace AppSellBook.Schema.Queries
                 phone = userDTO.phone,
                 purchaseAddress = userDTO.purchaseAddress,
                 deliveryAddress = userDTO.deliveryAddress,
-                dateOfBirth=userDTO.dateOfBirth,
+                dateOfBirth = userDTO.dateOfBirth,
                 point = userDTO.point,
                 isBlock = userDTO.isBlock,
             };
         }
         public async Task<IEnumerable<UserResult>> GetUsers()
         {
-            IEnumerable<User> users= await _userRepository.GetAllUser();
-            return users.Select(u=>new UserResult()
+            IEnumerable<User> users = await _userRepository.GetAllUser();
+            return users.Select(u => new UserResult()
             {
-                username= u.username,
-                password= u.password,
+                userId = u.userId, 
+                username = u.username,
+                password = u.password,
                 point = u.point,
-                email=u.email,
-                phone=u.phone,
-                gender=u.gender,
+                email = u.email,
+                phone = u.phone,
+                gender = u.gender,
                 dateOfBirth = u.dateOfBirth,
-                deliveryAddress=u.deliveryAddress,
-                firstName=u.firstName,
-                isBlock=u.isBlock,
+                deliveryAddress = u.deliveryAddress,
+                firstName = u.firstName,
+                isBlock = u.isBlock,
 
             }).ToList();
         }
@@ -333,22 +343,17 @@ namespace AppSellBook.Schema.Queries
 
         public async Task<IEnumerable<OrderResult>> GetOrderConfirm()
         {
-            // Lấy danh sách orders từ repository
             IEnumerable<Order> orders = await _orderRepository.GetOrdersByProcesing();
-
-            // Nếu orders là null hoặc rỗng, trả về danh sách rỗng
             if (orders == null || !orders.Any())
             {
                 return new List<OrderResult>();
             }
-
-            // Duyệt qua từng order và tạo OrderResult
             return orders.Select(o => new OrderResult()
             {
-                user= new UserResult()
+                user = new UserResult()
                 {
-                    userId=o.userId,
-                    firstName=o.user.firstName
+                    userId = o.userId,
+                    firstName = o.user.firstName
                 },
                 orderId = o.orderId,
                 deliveryAddress = o.deliveryAddress,
@@ -376,15 +381,16 @@ namespace AppSellBook.Schema.Queries
         }
         public async Task<OrderResult> GetOrderById(int orderId)
         {
-            Order order= await _orderRepository.GetOrderById(orderId);
+            Order order = await _orderRepository.GetOrderById(orderId);
             return new OrderResult()
             {
                 user = new UserResult()
                 {
                     firstName = order.user.firstName
                 },
+                totalMoney= order.totalMoney,
                 deliveryAddress = order.deliveryAddress,
-                paymentMethod= order.paymentMethod,
+                paymentMethod = order.paymentMethod,
                 orderDetails = order.orderDetails?.Select(d =>
                 {
                     if (d.book == null)
@@ -399,12 +405,32 @@ namespace AppSellBook.Schema.Queries
                         }
                     };
                 })
-                .Where(d => d != null) 
+                .Where(d => d != null)
                 .ToList() ?? new List<OrderDetailResult>()
             };
         }
-        //Notification
-        public async Task<IEnumerable<NotificationResult>> GetAllNotification(int userId)
+
+        public async Task<IEnumerable<OrderResult>> GetAllOrders(){
+            IEnumerable<Order> orders= await _orderRepository.GetAllOrder();
+            return orders.Select(d => new OrderResult()
+            {
+                orderId = d.orderId,
+                orderStatus = d.orderStatus,
+                deliveryDate = d.deliveryDate,
+                user= new UserResult()
+                {
+                    firstName=d.user.firstName
+                },
+                orderDetails= d.orderDetails?.Select(o => new OrderDetailResult()
+                {
+                    bookId=o.bookId,
+                    quantity=o.quantity,
+                    sellPrice=o.sellPrice
+                })
+            });
+        }
+    //Notification
+    public async Task<IEnumerable<NotificationResult>> GetAllNotification(int userId)
         {
             IEnumerable<Notification> notifications= await _notificationRepository.GetAllNotificationsForUser(userId);
             return notifications.Select(r => new NotificationResult()

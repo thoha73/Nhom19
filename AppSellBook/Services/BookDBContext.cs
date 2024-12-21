@@ -22,6 +22,7 @@ namespace AppSellBook.Services
         public DbSet<BookWishList> BookWishList { get; set; }
         public DbSet<BookCategory> BookCategory { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
