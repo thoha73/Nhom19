@@ -1,0 +1,49 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/img_avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_account"
+        android:layout_marginRight="16dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/student_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên sinh viên"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/student_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="22115053122251@sv.ute.udn.vn"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/student_msv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MSV: 12345678"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/student_lop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lớp: 22T2"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>
